@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: 'mysql:latest'
+    container_name: 'cgos-back-end-mysql-1'
+    environment:
+      - 'MYSQL_DATABASE=cgos'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=myuser'
+    ports:
+      - '32789:3306'
+    volumes:
+      - 'mysql-data:/var/lib/mysql'
+
+volumes: 
+  mysql-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /path/to/mysql/data
+      o: bind
