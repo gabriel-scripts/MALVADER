@@ -1,1 +1,1 @@
-docker exec -i MALVADER mysql -u root -pverysecret < ./scripts/dockerscripts/bank.sq
+docker exec -i MALVADER mysql -u root -pverysecret < ./scripts/docker-entrypoint-initdb.d/bank.sqdocker exec -i MALVADER mysql -u root -pverysecret < ./scripts/dockerscripts/bank.sq
