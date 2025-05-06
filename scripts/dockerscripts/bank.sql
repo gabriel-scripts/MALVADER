@@ -2,7 +2,6 @@ CREATE DATABASE IF NOT EXISTS MALVADER;
 
 USE MALVADER;
 
--- Tabela usuario
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -15,7 +14,6 @@ CREATE TABLE usuario (
     otp_expiracao DATETIME
 ) ENGINE=InnoDB;
 
--- Tabela endereco
 CREATE TABLE endereco (
     id_endereco INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -29,7 +27,6 @@ CREATE TABLE endereco (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 ) ENGINE=InnoDB;
 
--- Tabela funcionario
 CREATE TABLE funcionario (
     id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT UNIQUE NOT NULL,
@@ -40,7 +37,6 @@ CREATE TABLE funcionario (
     FOREIGN KEY (id_supervisor) REFERENCES funcionario(id_funcionario)
 ) ENGINE=InnoDB;
 
--- Tabela cliente
 CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT UNIQUE NOT NULL,
@@ -48,7 +44,6 @@ CREATE TABLE cliente (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 ) ENGINE=InnoDB;
 
--- Tabela agencia
 CREATE TABLE agencia (
     id_agencia INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -57,7 +52,6 @@ CREATE TABLE agencia (
     FOREIGN KEY (endereco_id) REFERENCES endereco(id_endereco)
 ) ENGINE=InnoDB;
 
--- Tabela conta
 CREATE TABLE conta (
     id_conta INT AUTO_INCREMENT PRIMARY KEY,
     numero_conta VARCHAR(20) UNIQUE NOT NULL,
@@ -71,7 +65,6 @@ CREATE TABLE conta (
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 ) ENGINE=InnoDB;
 
--- Tabela conta_poupanca
 CREATE TABLE conta_poupanca (
     id_conta_poupanca INT AUTO_INCREMENT PRIMARY KEY,
     id_conta INT UNIQUE NOT NULL,
@@ -80,7 +73,6 @@ CREATE TABLE conta_poupanca (
     FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
 ) ENGINE=InnoDB;
 
--- Tabela conta_corrente
 CREATE TABLE conta_corrente (
     id_conta_corrente INT AUTO_INCREMENT PRIMARY KEY,
     id_conta INT UNIQUE NOT NULL,
@@ -90,7 +82,6 @@ CREATE TABLE conta_corrente (
     FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
 ) ENGINE=InnoDB;
 
--- Tabela conta_investimento
 CREATE TABLE conta_investimento (
     id_conta_investimento INT AUTO_INCREMENT PRIMARY KEY,
     id_conta INT UNIQUE NOT NULL,
@@ -100,7 +91,6 @@ CREATE TABLE conta_investimento (
     FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
 ) ENGINE=InnoDB;
 
--- Tabela transacao
 CREATE TABLE transacao (
     id_transacao INT AUTO_INCREMENT PRIMARY KEY,
     id_conta_origem INT NOT NULL,
@@ -113,7 +103,6 @@ CREATE TABLE transacao (
     FOREIGN KEY (id_conta_destino) REFERENCES conta(id_conta)
 ) ENGINE=InnoDB;
 
--- Tabela auditoria
 CREATE TABLE auditoria (
     id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -123,7 +112,6 @@ CREATE TABLE auditoria (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 ) ENGINE=InnoDB;
 
--- Tabela relatorio
 CREATE TABLE relatorio (
     id_relatorio INT AUTO_INCREMENT PRIMARY KEY,
     id_funcionario INT NOT NULL,
