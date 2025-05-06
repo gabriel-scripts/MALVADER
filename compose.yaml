@@ -8,9 +8,10 @@ services:
       - 'MYSQL_ROOT_PASSWORD=verysecret'
       - 'MYSQL_USER=myuser'
     ports:
-      - '32789:3306'
+      - '33789:3306'
     volumes:
       - 'mysql-data:/var/lib/mysql'
+      - './scripts:/dockerscripts'
 
 volumes: 
   mysql-data:
