@@ -1,4 +1,4 @@
-# Banck Malveder
+# Bank Malveder
 
 Account Management System
 
