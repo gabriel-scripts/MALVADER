@@ -8,7 +8,7 @@ class Funcionario:
         self.id_supervisor = id_supervisor
 
     def __str__(self):
-        return f"Usuario(id_funcionario={self.id_funcionario}, nome={self.nombre}, codigo_funcionario={self.correo})"
+        return f"Usuario(id_funcionario={self.id_funcionario}"
     
     @property
     def nome(self):
