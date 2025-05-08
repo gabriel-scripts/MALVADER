@@ -10,7 +10,7 @@ CREATE TABLE usuario (
     telefone VARCHAR(15),
     tipo_usuario ENUM('cliente', 'funcionario', 'admin') NOT NULL,
     senha_hash VARCHAR(255) NOT NULL,
-    otp_ativo BOOLEAN DEFAULT FALSE
+    otp_ativo BOOLEAN DEFAULT FALSE,
     otp_expiracao DATETIME,
     PRIMARY KEY(id_usuario)
 );
@@ -58,15 +58,7 @@ CREATE TABLE conta (
     numero_conta VARCHAR(20) UNIQUE NOT NULL,
     id_agencia INT NOT NULL,
     saldo DECIMAL(15,2) DEFAULT 0.00,
-    tipo_conta ENUM('poupanca', 'correnCREATE TABLE funcionario (
-    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT UNIQUE NOT NULL,
-    codigo_funcionario VARCHAR(20) UNIQUE NOT NULL,
-    cargo VARCHAR(50) NOT NULL,
-    id_supervisor INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
-    FOREIGN KEY (id_supervisor) REFERENCES funcionario(id_funcionario)
-) ;te', 'investimento') NOT NULL,
+    tipo_conta ENUM('poupanca', 'corrente', 'investimento') NOT NULL,
     id_cliente INT NOT NULL,
     data_abertura DATE NOT NULL,
     status ENUM('ativa', 'inativa', 'bloqueada') DEFAULT 'ativa',
@@ -129,3 +121,14 @@ CREATE TABLE relatorio (
     conteudo TEXT,
     FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
 );
+
+DELIMITER $$
+CREATE TRIGGER depositar_emprestimo AFTER UPDATE ON emprestimo
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'APROVADO' AND OLD.status != 'APROVADO' THEN
+        INSERT INTO transacao (id_conta_origem, tipo_transacao, valor, data_hora, descricao)
+        VALUES (NEW.id_conta, 'DEPOSITO', NEW.valor_solicitado, NOW(), CONCAT('Empréstimo ID ', NEW.id_emprestimo));
+    END IF;
+END $$
+DELIMITER ;

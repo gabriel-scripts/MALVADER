@@ -20,7 +20,6 @@ class Usuario:
         else:
             raise ValueError("error: invalid name")   
         
-
 class Cliente: 
     def __init__(self, id_cliente, score_credito, id_usuario):
         self.id_cliente = id_cliente
