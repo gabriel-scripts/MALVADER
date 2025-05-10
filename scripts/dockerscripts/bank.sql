@@ -1,5 +1,4 @@
 CREATE DATABASE IF NOT EXISTS MALVADER;
-
 USE MALVADER;
 
 CREATE TABLE usuario (
@@ -104,6 +103,21 @@ CREATE TABLE transacao (
     FOREIGN KEY (id_conta_destino) REFERENCES conta(id_conta)
 );
 
+CREATE TABLE emprestimo (
+    id_emprestimo INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_conta INT NOT NULL,
+    valor_solicitado DECIMAL(15,2) NOT NULL,
+    valor_aprovado DECIMAL(15,2),
+    taxa_juros DECIMAL(5,2),
+    prazo_meses INT,
+    status ENUM('PENDENTE', 'APROVADO', 'NEGADO', 'PAGO') DEFAULT 'PENDENTE',
+    data_solicitacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_aprovacao DATETIME,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
+    FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
+);
+
 CREATE TABLE auditoria (
     id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -123,12 +137,18 @@ CREATE TABLE relatorio (
 );
 
 DELIMITER $$
+
 CREATE TRIGGER depositar_emprestimo AFTER UPDATE ON emprestimo
 FOR EACH ROW
 BEGIN
     IF NEW.status = 'APROVADO' AND OLD.status != 'APROVADO' THEN
-        INSERT INTO transacao (id_conta_origem, tipo_transacao, valor, data_hora, descricao)
-        VALUES (NEW.id_conta, 'DEPOSITO', NEW.valor_solicitado, NOW(), CONCAT('Empréstimo ID ', NEW.id_emprestimo));
+        INSERT INTO transacao (
+            id_conta_origem, tipo_transacao, valor, data_hora, descricao
+        )
+        VALUES (
+            NEW.id_conta, 'deposito', NEW.valor_solicitado, NOW(), CONCAT('Empréstimo ID ', NEW.id_emprestimo)
+        );
     END IF;
 END $$
+
 DELIMITER ;
