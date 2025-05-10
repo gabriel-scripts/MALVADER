@@ -1,41 +1,55 @@
-class Usuario:
-    def __init__(self, id_usuario, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash, ):
-        self.id_usuario = id_usuario
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy.orm import relationship
+
+from dao.config.database import Base
+from sqlalchemy.ext.declarative import declarative_base
+
+class Usuario(Base):
+    __tablename__ = 'usuarios'
+    
+    id_usuario = Column(Integer, primary_key=True, autoincrement=True)
+    nome = Column(String(100), nullable=False)
+    cpf = Column(String(11), unique=True, nullable=False)
+    data_nascimento = Column(Date)
+    telefone = Column(String(20))
+    tipo_usuario = Column(String(20), nullable=False)
+    senha_hash = Column(String(255), nullable=False)
+
+    cliente = relationship("Cliente", back_populates="usuario", uselist=False)
+    
+    def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash):
         self.nome = nome
         self.cpf = cpf
         self.data_nascimento = data_nascimento
         self.telefone = telefone
+        self.tipo_usuario = tipo_usuario
+        self.senha_hash = senha_hash
+    
+    def __repr__(self):
+        return f"<Usuario(id={self.id_usuario}, nome='{self.nome}', tipo={self.tipo_usuario})>"
 
-    def __str__(self):
-        return f"Usuario(id_usuario={self.id_usuario})"
-    
     @property
-    def nome(self):
-        return self.nome
+    def nome_completo(self):
+        return self._nome
     
-    @nome.setter    
-    def nome(self, nome_novo):
-        if isinstance(nome_novo, str) and nome_novo.strip():
-            self.nome = nome_novo
-        else:
-            raise ValueError("error: invalid name")   
-        
-class Cliente: 
-    def __init__(self, id_cliente, score_credito, id_usuario):
-        self.id_cliente = id_cliente
+    @nome_completo.setter    
+    def nome_completo(self, valor):
+        if not isinstance(valor, str) or not valor.strip():
+            raise ValueError("Nome deve ser uma string não vazia")
+        self._nome = valor.strip()
+
+class Cliente(Base):
+    __tablename__ = 'clientes'
+    
+    id_cliente = Column(Integer, primary_key=True, autoincrement=True)
+    score_credito = Column(Integer)
+    id_usuario = Column(Integer, ForeignKey('usuarios.id_usuario'), unique=True)
+    
+    usuario = relationship("Usuario", back_populates="cliente")
+    
+    def __init__(self, score_credito, usuario):
         self.score_credito = score_credito
-        self.id_usuario = id_usuario
-
-    def __str__(self):
-        return f"Usuario(id_usuario={self.id_cliente}"
+        self.usuario = usuario
     
-    @property
-    def nome(self):
-        return self.nome
-    
-    @nome.setter    
-    def nome(self, nome_novo):
-        if isinstance(nome_novo, str) and nome_novo.strip():
-            self.nome = nome_novo
-        else:
-            raise ValueError("error: invalid name")
+    def __repr__(self):
+        return f"<Cliente(id={self.id_cliente}, score={self.score_credito})>"
