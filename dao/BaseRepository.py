@@ -7,15 +7,15 @@ T = TypeVar('T')
 class BaseRepository(Generic[T], ABC):
     def __init__(self, db: Session):
         self.db = db
-    
+
     @abstractmethod
-    def get(self, id: int) -> Optional[T]:
+    def get_by_id(self, id: int) -> Optional[T]:
         pass
     
     @abstractmethod
     def get_all(self, skip: int = 0, limit: int = 100) -> List[T]:
         pass
-    
+
     @abstractmethod
     def create(self, entity: T) -> T:
         pass

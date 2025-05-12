@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from dao.config.database import Base
 
 class Endereco(Base):
-    __tablename__ = 'enderecos'
+    __tablename__ = 'endereco'
     
     id_endereco = Column(Integer, primary_key=True, autoincrement=True)
     logradouro = Column(String(255), nullable=False)

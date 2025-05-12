@@ -1,7 +1,12 @@
 from dao.UserRepository import UserRepository
+from dao.config.database import SessionLocal
+from dao.config.createTables import create_tables
+
+create_tables()
 
 def test():
-    user = UserRepository()
+    db = SessionLocal()
+    user = UserRepository(db)
     user_data = {
         "nome": "Teste",
         "cpf": "12345678901",
@@ -11,7 +16,7 @@ def test():
         "senha_hash": "hash123"
     }
 
-    user.addUser(user_data)
+    user.addUser(user_data) 
     pass
 
 test()

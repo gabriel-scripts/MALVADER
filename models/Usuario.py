@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
 from dao.config.database import Base
 from sqlalchemy.ext.declarative import declarative_base
 
 class Usuario(Base):
-    __tablename__ = 'usuarios'
+    __tablename__ = 'usuario'
     
     id_usuario = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String(100), nullable=False)
@@ -14,6 +14,8 @@ class Usuario(Base):
     telefone = Column(String(20))
     tipo_usuario = Column(String(20), nullable=False)
     senha_hash = Column(String(255), nullable=False)
+    otp_ativo = Column(Boolean, default=False)
+    otp_expiracao = Column(Date)
 
     cliente = relationship("Cliente", back_populates="usuario", uselist=False)
     
@@ -37,19 +39,3 @@ class Usuario(Base):
         if not isinstance(valor, str) or not valor.strip():
             raise ValueError("Nome deve ser uma string não vazia")
         self._nome = valor.strip()
-
-class Cliente(Base):
-    __tablename__ = 'clientes'
-    
-    id_cliente = Column(Integer, primary_key=True, autoincrement=True)
-    score_credito = Column(Integer)
-    id_usuario = Column(Integer, ForeignKey('usuarios.id_usuario'), unique=True)
-    
-    usuario = relationship("Usuario", back_populates="cliente")
-    
-    def __init__(self, score_credito, usuario):
-        self.score_credito = score_credito
-        self.usuario = usuario
-    
-    def __repr__(self):
-        return f"<Cliente(id={self.id_cliente}, score={self.score_credito})>"

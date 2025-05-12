@@ -1,4 +1,4 @@
-from database import engine, Base
+from dao.config.database import engine, Base
 
-def create_database():
+def create_tables():
     Base.metadata.create_all(bind=engine)
