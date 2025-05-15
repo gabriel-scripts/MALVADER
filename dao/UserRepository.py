@@ -1,85 +1,43 @@
-database = []
 
-# testando os requisitos funcionais com um banco de dados em memória
+from sqlalchemy.orm import Session
+from models.Usuario import Usuario
 
-class UserRepository:
-    def __init__(self):
-        self.database = database
+from dao.BaseRepository import BaseRepository
 
-    def SaveUser(self, user):
+from typing import Optional, List
+
+class UserRepository(BaseRepository[Usuario]):
+    def get_all(self) -> List[Usuario]:
+        return self.db.query(Usuario).all()
+
+    def create(self, user_data: dict) -> Usuario:
         try:
-            self.database.append(user)
-            return print("User saved successfully!")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
+            novo_user = Usuario(**user_data)
+            self.db.add(novo_user)
+            self.db.commit()
+            self.db.refresh(novo_user)
+            return novo_user
+        except TypeError as E:
+            print(f'Error to save user {E}')
+
+    def get_by_id(self, id_usuario: int) -> Optional[Usuario]:
+        try:
+            return self.db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
+        except TypeError as E:
+            print(f'Error to get user {E}')
     
-    def Savecliente(self, user):
+    def update(self, id_usuario: int, usuario_user: dict) -> Optional[Usuario]:
         try:
-            self.database.append(user)
-            return print("User saved successfully!")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
+            self.db.query(Usuario).filter(Usuario.id_usuario == id_usuario).update(usuario_user)
+            self.db.commit() 
+            self.db.refresh(usuario_user)
+        except TypeError as E:
+            print(f'Error to update user {E}')
 
-        return print("Cliente saved successfully!")
-
-    def ListClientes(self):
-        try:
-            if not self.database:
-                raise ValueError("No users found in the database.")
-            
-            for user in self.database:
-                print(user)
-        
-        except ValueError as e:
-            print(f"Error: {e}")
-
-    def GetClienteById(self, id_cliente):
-        try:
-            for user in self.database:
-                if user.id_cliente == id_cliente:
-                    return user
-            raise ValueError("User not found.")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
-
-    def SaveUser(user):
-        try:
-            database.append(user)
-            return print("User saved successfully!")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
-        
-    def Savecliente(user):
-        try:
-            database.append(user)
-            return print("User saved successfully!")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
-
-        return print("Cliente saved successfully!")
-
-    def ListClientes():
-        try:
-            if not database:
-                raise ValueError("No users found in the database.")
-            
-            for user in database:
-                print(user)
-        
-        except ValueError as e:
-            print(f"Error: {e}")
-
-    def GetClienteById(id_cliente):
-        try:
-            for user in database:
-                if user.id_cliente == id_cliente:
-                    return user
-            raise ValueError("User not found.")
-        
-        except ValueError as e:
-            print(f"Error: {e}")
+    def delete(self, id_usuario: int) -> bool:
+        user = self.get_by_id(id_usuario)
+        if not user:
+            return False
+        self.db.delete(user)
+        self.db.commit()
+        return True
