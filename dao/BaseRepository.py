@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, List, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import AsyncSession
 
 T = TypeVar('T')
 
 class BaseRepository(Generic[T], ABC):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
     @abstractmethod

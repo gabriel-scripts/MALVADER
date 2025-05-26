@@ -1,27 +1,35 @@
 from dao.ClienteRepository import ClienteRepository
+from dao.
 
 from models.Cliente import Cliente
 from models.Funcionario import Funcionario
 from models.Usuario import Usuario
 
+import json
+
 from util.isValidCpf import isValidCpf
 from util.hashPassword import generate_hash
 from util.parseDataToUser import parseDataToUser
 
-def validate_data():
+async def validate_data(user_data):
     try:
-        cliente_cpf = ClienteRepository.get_by_cpf(Cliente.cpf)
-        if(isValidCpf(Cliente) == False):
+        if isValidCpf(user_data[""] == False):
+            raise ValueError("CPF invalid")
+        if user_data[""] is None or user_data[""] == '':
             raise ValueError("CPF cannot be null")
-        if Cliente.cpf is None or Cliente.cpf == '':
-            raise ValueError("CPF cannot be null")
-        if Cliente.nome is None or Cliente.nome == '':
+        if user_data[""] is None or user_data[""] == '':
             raise ValueError("Name cannot be null.")
-        if Cliente.data_nascimento is None:
+        if user_data[""] is None:
             raise ValueError("Data cannot be null")
-        if Cliente.telefone is None or Cliente.telefone == '':
+        if user_data[""]or user_data[""] == '':
             raise ValueError("Phone cannot be null.") 
-        if cliente_cpf:
+        
+        if user_data[""] == 'funcionario':
+            cpf = await
+        if user_data[""] == 'funcget_by_cpfionario':
+            cpf = await ClienteRepository.get_by_cpf(user_data[""])
+
+        if cpf:
             raise ValueError("Cliente alredy exists on data base")
     except Exception as e:
         print(f"error on validateCliete  {e}")
@@ -39,21 +47,30 @@ def registerFuncionario(Funcionario: Funcionario):
 def registerUsuario():
     pass
 
-def handleRegister(form_data):
+async def handleRegister(form_data):
     try:
-        if form_data["tipo_usuario"] == 'cliente':
-            cliente_data = form_data
-            cliente_data["senha_hash"] = generate_hash(cliente_data["senha"])
+        data_dict = json.loads(form_data)
+        validate_data(form_data)
 
-            user_data = parseDataToUser(form_data)
+        if form_data["tipo_usuario"] == 'cliente':
+            cliente_data = data_dict
+            
+            user_data = parseDataToUser(data_dict)
+            registerUsuario(user_data)
+            cliente_data["senha_hash"] = await generate_hash(cliente_data["senha"])
 
             registerUsuario(user_data)
             registerCliente(cliente_data)
-        if(form_data["tipo_usuario"] == 'funcionario'):
+
+        if(form_data["tipo_usuario"] == 'funcionario'): 
+            user_data = parseDataToUser(form_data)
+            validate_data(user_data)
+
             funcionario_data = form_data
-            funcionario_data["senha_hash"] = generate_hash(cliente_data["senha"])
+            funcionario_data["senha_hash"] = await generate_hash(cliente_data["senha"])
             registerUsuario()
             registerFuncionario(cliente_data)
+
         if(form_data["tipo_usuario"] == None):
             raise ValueError("Error: user type passe cannot be null.")
         else:

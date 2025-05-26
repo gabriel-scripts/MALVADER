@@ -2,15 +2,28 @@ from models.Usuario import Cliente
 from dao.BaseRepository import BaseRepository
 from typing import Optional, List
 
+from sqlalchemy.orm import AsyncSession
+
 class ClienteRepository(BaseRepository[Cliente]):
-    def get_all(self) -> List[Cliente]:
-        with self.db.session() as session:
+
+    def __init__(self, session: AsyncSession):
+        super().__init__(session, Cliente)
+
+    async def get_all(self) -> List[Cliente]:
+        with await self.db.session() as session:
             return session.query(Cliente).all()
 
-    def get_by_id(self, id):
+    async def find_by_cpf(self, cpf):
+        try:
+            cpf = await session.q
+        except Exception as e:
+            pass
+        pass
+
+    async def get_by_id(self, id):
         try:
             with self.db.session() as session:
-                cliente = session.query(Cliente).filter(Cliente.id == id).first()
+                cliente = await session.query(Cliente).filter(Cliente.id == id).first()
                 if not cliente:
                     raise ValueError(f"Cliente with id {id} not found")
                 return cliente
@@ -18,21 +31,21 @@ class ClienteRepository(BaseRepository[Cliente]):
             print(f"Error to get cliente: {e}")
             return None
         
-    def create(self, cliente):
+    async def create(self, cliente):
         try: 
             with self.db.session() as session:
-                session.add(cliente)
-                session.commit()
+                await session.add(cliente)
+                await session.commit()
                 return cliente
         except Exception as e:
             session.rollback()
             print(f"Error creating cliente: {e}")
             return None
 
-    def update(self, cliente):
+    async def update(self, cliente):
         try:
             with self.db.session() as session:
-                existing_cliente = session.query(Cliente).filter(Cliente.id == cliente.id).first()
+                existing_cliente = await session.query(Cliente).filter(Cliente.id == cliente.id).first()
                 if existing_cliente:
                     for key, value in cliente.__dict__.items():
                         setattr(existing_cliente, key, value)
@@ -44,22 +57,22 @@ class ClienteRepository(BaseRepository[Cliente]):
             print(f"Error updating cliente: {e}")
             return None
 
-    def delete(self, id):
+    async def delete(self, id):
         try:
             with self.db.session() as session:
-                cliente = session.query(Cliente).filter(Cliente.id == id).first()
+                cliente = await session.query(Cliente).filter(Cliente.id == id).first()
                 if not cliente:
                     raise ValueError(f"Cliente with id {id} not found")
-                session.delete(cliente)
-                session.commit()
+                await session.delete(cliente)
+                await session.commit()
                 return True
         except ValueError as e:
             print(f"Error deleting cliente: {e}")
             return False
         
-    def get_all(self):
+    async def get_all(self):
         try:
             with self.db.session() as session:
-                return session.query(Cliente).all()
+                return await session.query(Cliente).all()
         except Exception as e:
             print(f"Error getting all clientes: {e}")
