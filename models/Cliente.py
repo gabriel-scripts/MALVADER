@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 class Cliente(Base):
-    __tablename__ = 'clientes'
+    __tablename__ = 'cliente'
     
     id_cliente = Column(Integer, primary_key=True, autoincrement=True)
     score_credito = Column(Integer)
