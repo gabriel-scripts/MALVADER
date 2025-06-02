@@ -14,6 +14,3 @@ class Cliente(Base):
     def __init__(self, score_credito, usuario):
         self.score_credito = score_credito
         self.usuario = usuario
-    
-    def __repr__(self):
-        return f"<Cliente(id={self.id_cliente}, score={self.score_credito})>"

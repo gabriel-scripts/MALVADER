@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, List, Optional
-from sqlalchemy.orm import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 T = TypeVar('T')
 
@@ -9,26 +9,21 @@ class BaseRepository(Generic[T], ABC):
         self.db = db
 
     @abstractmethod
-    def get_by_id(self, id: int) -> Optional[T]:
-        pass
-    
-    @abstractmethod
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[T]:
+    async def get_by_id(self, id: int) -> Optional[T]:
         pass
 
     @abstractmethod
-    def create(self, entity: T) -> T:
+    async def get_all(self) -> List[T]:
         pass
-    
+
     @abstractmethod
-    def update(self, id: int, entity_data: dict) -> Optional[T]:
+    async def create(self, entity_data: dict) -> T:
         pass
-    
+
     @abstractmethod
-    def delete(self, id: int) -> bool:
+    async def update(self, id: int, entity_data: dict) -> Optional[T]:
         pass
-    
-    def _commit_refresh(self, entity: T) -> T:
-        self.db.commit()
-        self.db.refresh(entity)
-        return entity
+
+    @abstractmethod
+    async def delete(self, id: int) -> bool:
+        pass

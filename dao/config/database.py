@@ -1,12 +1,17 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-import os
-from dotenv import load_dotenv
 
+from contextlib import asynccontextmanager
+
+import os
 
 try:
-    load_dotenv()
+    @asynccontextmanager
+    async def get_async_session():
+        async with SessionLocal() as session:
+            yield session
+
     DATABASE_URL = os.getenv("DATABASE_URL", "mysql+asyncmy://root:verysecret@localhost:33789/MALVADER")
 
     engine = create_async_engine(

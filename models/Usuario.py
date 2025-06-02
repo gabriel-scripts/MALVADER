@@ -26,16 +26,3 @@ class Usuario(Base):
         self.telefone = telefone
         self.tipo_usuario = tipo_usuario
         self.senha_hash = senha_hash
-    
-    def __repr__(self):
-        return f"<Usuario(id={self.id_usuario}, nome='{self.nome}', tipo={self.tipo_usuario})>"
-
-    @property
-    def nome_completo(self):
-        return self._nome
-    
-    @nome_completo.setter    
-    def nome_completo(self, valor):
-        if not isinstance(valor, str) or not valor.strip():
-            raise ValueError("Nome deve ser uma string não vazia")
-        self._nome = valor.strip()

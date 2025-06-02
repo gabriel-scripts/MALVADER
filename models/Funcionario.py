@@ -26,17 +26,3 @@ class Funcionario(Base):
         self.cargo = cargo
         self.id_usuario = id_usuario
         self.id_supervisor = id_supervisor
-
-    def __str__(self):
-        return f"Usuario(id_funcionario={self.id_funcionario} nome={self.nome} cargo={self.cargo})"
-    
-    @property
-    def nome(self):
-        return self.nome
-    
-    @nome.setter    
-    def nome(self, nome_novo):
-        if isinstance(nome_novo, str) and nome_novo.strip():
-            self.nome = nome_novo
-        else:
-            raise ValueError("error: invalid name")   

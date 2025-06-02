@@ -6,7 +6,7 @@ from sqlalchemy.orm import AsyncSession
 
 class ClienteRepository(BaseRepository[Cliente]):
 
-    def __init__(self, session: AsyncSession):
+    async def __init__(self, session: AsyncSession):
         super().__init__(session, Cliente)
 
     async def get_all(self) -> List[Cliente]:
@@ -15,10 +15,15 @@ class ClienteRepository(BaseRepository[Cliente]):
 
     async def find_by_cpf(self, cpf):
         try:
-            cpf = await session.q
+            with self.db.session() as session:
+                cpf_cliente = await session.query(Cliente).filter(Cliente.cpf == cpf).first()
+                if not cpf:
+                    raise ValueError(f"Cliente with cpf {cpf} not found")
+                return cpf_cliente
+    
         except Exception as e:
-            pass
-        pass
+            print(f"Error to get cpf: {e}")
+            return None
 
     async def get_by_id(self, id):
         try:
