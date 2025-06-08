@@ -16,7 +16,7 @@ def test():
         "senha_hash": "hash123"
     }
 
-    user.addUser(user_data) 
+    user.create(user_data) 
     pass
 
 test()

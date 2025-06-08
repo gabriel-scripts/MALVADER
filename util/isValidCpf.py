@@ -14,9 +14,7 @@ def isValidCpf(cpf: int):
     verification = (total*10) % total_of_digits
 
     if(verification == int(cpf[9])):
-        print("true")
         return True
 
     if(verification != cpf[9]):
-        print("false")
         return False

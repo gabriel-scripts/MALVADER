@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Date,  Boolean, VARCHAR
 from sqlalchemy.orm import relationship
 
 from dao.config.database import Base
-from sqlalchemy.ext.declarative import declarative_base
 
 class Usuario(Base):
     __tablename__ = 'usuario'
@@ -16,13 +15,16 @@ class Usuario(Base):
     senha_hash = Column(String(255), nullable=False)
     otp_ativo = Column(Boolean, default=False)
     otp_expiracao = Column(Date)
+    email = Column(VARCHAR(255), unique=True, nullable=False)
 
     cliente = relationship("Cliente", back_populates="usuario", uselist=False)
-    
-    def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash):
+    funcionarios = relationship("Funcionario", back_populates="usuario")
+
+    def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash, email,):
         self.nome = nome
         self.cpf = cpf
         self.data_nascimento = data_nascimento
         self.telefone = telefone
         self.tipo_usuario = tipo_usuario
         self.senha_hash = senha_hash
+        self.email = email

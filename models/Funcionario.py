@@ -12,12 +12,12 @@ class Funcionario(Base):
     data_nascimento = Column(Date)
 
     cargo = Column(String(20), nullable=False)
-    id_usuario = Column(String(20), nullable=False)
+    id_usuario = Column(Integer, ForeignKey("usuario.id_usuario"), nullable=False)
     id_supervisor = Column(String(20), nullable=False)
     senha_hash = Column(String(255), nullable=False, unique=True)
 
-    usuario = relationship("Usuario", back_populates="usuario", uselist=False)
-
+    usuario = relationship("Usuario", back_populates="funcionarios", uselist=False) 
+    
     def __init__(self, id_funcionario, nome, codigo_funcionario, data_nascimento, cargo, id_usuario, id_supervisor):
         self.id_funcionario = id_funcionario
         self.nome = nome

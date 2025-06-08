@@ -3,59 +3,52 @@ from dao.FuncionarioRepository import FuncionarioRepository
 
 from dao.UserRepository import UserRepository
 
-from models.Cliente import Cliente
-from models.Funcionario import Funcionario
-from models.Usuario import Usuario
-
-from validadeData import validate_data, cpf_exists, is_password_strong
-import json
+from services.validadeData import validate_data, cpf_exists, is_password_strong
 
 from util.hashPassword import generate_hash
-from util.parseDataToUser import parseDataToUser
+from util.parseData.ParseToCliente import parseDataToCliente
+from util.parseData.parseDataFuncionario import parseDataToFuncionario
+from util.parseData.parseDataToUser import parseDataToUser
 
-async def registerUsuario(Usuario: Usuario, session):
+async def registerUsuario(Usuario: dict, session):
     user_repo = UserRepository(session)
     usuario = await user_repo.create(Usuario)
     return usuario
 
-async def registerCliente(Cliente: Cliente, session):
-    cliente_repo = ClienteRepository(session)
-    cliente = await cliente_repo.create(Cliente)
+async def registerCliente(Cliente: dict, session):
+    cliente_repository = ClienteRepository(session)
+    cliente = await cliente_repository.create(Cliente)
     return cliente
 
-async def registerFuncionario(Funcionario: Funcionario, session):
-    funcionario_repo = FuncionarioRepository(session)
-    funcionario = await funcionario_repo.create(Funcionario)
+async def registerFuncionario(Funcionario: dict, session):
+    funcionario_repository = FuncionarioRepository(session)
+    funcionario = await funcionario_repository.create(Funcionario)
     return funcionario
 
-async def handleRegister(form_data, session):
+async def handleRegister(user_data, session):
     try:
+        user_data_dict = user_data.dict()
+
         user_repository = UserRepository(session)
-       
-        if isinstance(form_data, str):
-            data_dict = json.loads(form_data)
 
-        await validate_data(data_dict)
-        await cpf_exists(data_dict["cpf"], user_repository)
-        await is_password_strong(data_dict["senha"])
+        await validate_data(user_data_dict)
+        await cpf_exists(user_data_dict, user_repository)
+        await is_password_strong(user_data_dict["senha_hash"])
 
-        data_dict["senha_hash"] = await generate_hash(data_dict["senha"])
-        tipo_usuario = data_dict.get("tipo_usuario")
+        user_data_dict["senha_hash"] = generate_hash(user_data_dict["senha_hash"])
 
-        cpf_exists(data_dict["senha_hash"])
+        user_parsed_data = parseDataToUser(user_data_dict)
 
-        if tipo_usuario == 'cliente':
-            user_data = parseDataToUser(data_dict)
-            usuario = await registerUsuario(user_data, session)
-            cliente_data = {**data_dict, "id_usuario": usuario.id_usuario}
-            await registerCliente(cliente_data, session)
+        if user_data_dict["tipo_usuario"] == 'cliente':
+            await registerUsuario(user_parsed_data, session)
+            cliente_parsed_data = parseDataToCliente(user_data_dict, user_parsed_data)
+            await registerCliente(cliente_parsed_data, session)
             return {"200": "Cliente registed with success"}
 
-        if tipo_usuario == 'funcionario':
-            user_data = parseDataToUser(data_dict)
-            usuario = await registerUsuario(user_data, session)
-            funcionario_data = {**data_dict, "id_usuario": usuario.id_usuario}
-            await registerFuncionario(funcionario_data, session)
+        if user_data_dict["tipo_usuario"] == 'funcionario':
+            registerUsuario(user_parsed_data, session)
+            funcionario_parsed_data = parseDataToFuncionario(user_data_dict)
+            await registerFuncionario(funcionario_parsed_data, session)
             return {"200": "Funcionario registed with success"}
         
     except Exception as e:
