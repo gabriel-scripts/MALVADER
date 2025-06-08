@@ -10,24 +10,26 @@ from util.parseData.ParseToCliente import parseDataToCliente
 from util.parseData.parseDataFuncionario import parseDataToFuncionario
 from util.parseData.parseDataToUser import parseDataToUser
 
-async def registerUsuario(Usuario: dict, session):
+async def registerUsuario(usuario: dict, session):
     user_repo = UserRepository(session)
-    usuario = await user_repo.create(Usuario)
+    usuario = await user_repo.create(usuario)
     return usuario
 
-async def registerCliente(Cliente: dict, session):
+async def registerCliente(cliente: dict, session):
     cliente_repository = ClienteRepository(session)
-    cliente = await cliente_repository.create(Cliente)
+    cliente = await cliente_repository.create(cliente)
     return cliente
 
-async def registerFuncionario(Funcionario: dict, session):
+async def registerFuncionario(funcionario: dict, session):
     funcionario_repository = FuncionarioRepository(session)
-    funcionario = await funcionario_repository.create(Funcionario)
+    funcionario = await funcionario_repository.create(funcionario)
     return funcionario
 
 async def handleRegister(user_data, session):
     try:
         user_data_dict = user_data.dict()
+
+        print(user_data_dict)
 
         user_repository = UserRepository(session)
 
@@ -39,9 +41,12 @@ async def handleRegister(user_data, session):
 
         user_parsed_data = parseDataToUser(user_data_dict)
 
+        print(user_parsed_data)
+
         if user_data_dict["tipo_usuario"] == 'cliente':
-            await registerUsuario(user_parsed_data, session)
-            cliente_parsed_data = parseDataToCliente(user_data_dict, user_parsed_data)
+            usuario_salvo = await registerUsuario(user_parsed_data, session)
+            cliente_parsed_data = parseDataToCliente(user_data_dict, usuario_salvo)
+            print(cliente_parsed_data)
             await registerCliente(cliente_parsed_data, session)
             return {"200": "Cliente registed with success"}
 

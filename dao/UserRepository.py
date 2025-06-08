@@ -27,8 +27,6 @@ class UserRepository(BaseRepository[Usuario]):
         try:
             result = await self.db.execute(select(Usuario).where(Usuario.cpf == cpf))
             cpf_usuario = result.scalars().first()
-            if not cpf_usuario:
-                raise ValueError(f"Cliente with cpf {cpf} not found")
             return cpf_usuario
         except Exception as e:
             print(f"Error to get cpf: {e}")

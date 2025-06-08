@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 import os
 
 try:
-    @asynccontextmanager
     async def get_async_session():
         async with SessionLocal() as session:
             yield session

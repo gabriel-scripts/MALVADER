@@ -29,11 +29,8 @@ def getbyid():
 
 @app.post("/api/register")
 async def register_endpoint(form_data: UsuarioBase, session: AsyncSession = Depends(get_async_session)):
-    try:
-        await handleRegister(form_data, session)
-        return {"[200]", "User saved with success"}
-    except Exception as e:
-        return {"[400]: Erro to register user"}
+    await handleRegister(form_data, session)
+    return {"[200]", "User saved with success"}
 
     
 

@@ -17,12 +17,11 @@ async def validate_data(user_data: dict):
         raise HTTPException(status_code=400, detail="'Telefone' cannot be null") 
     
 async def cpf_exists(user_data, user_repository):
-    try:
-        existing = await user_repository.find_by_cpf(user_data["cpf"])
-        if existing:
-            raise HTTPException(status_code=400, detail="Usuário already exists.")
-    except Exception as e:
-        raise Exception(f"[error]: ValidateData.py on cpf_exists() as: {e}")
+
+    existing = await user_repository.find_by_cpf(user_data["cpf"])
+    if existing:
+        raise HTTPException(status_code=400, detail="Usuário already exists.")
+
     
 async def is_password_strong(user_password: str):
     password_length = len(user_password)
