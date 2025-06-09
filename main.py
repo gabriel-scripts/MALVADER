@@ -9,6 +9,8 @@ from services.handleRegister import handleRegister
 from services.handleLogin import handleLogin
 from models.pydantic.Usuario import UsuarioBase
 
+from util.send_otp import send_otp
+
 app = FastAPI()
 
 app.add_middleware(
@@ -19,28 +21,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health")
+@app.get("/")
 def health():
-    return {"status": "funcionando"}
-
-@app.get("/api/getbyid")
-def getbyid():
-    pass 
+    return {"[200]": "Running - welcome to Malvader bank"}
 
 @app.post("/api/register")
 async def register_endpoint(form_data: UsuarioBase, session: AsyncSession = Depends(get_async_session)):
     await handleRegister(form_data, session)
     return {"[200]", "User saved with success"}
 
-    
-
 @app.post('/api/login')
 async def login_endpoint(data: UsuarioBase, session: AsyncSession = Depends( get_async_session )):
-    return await handleLogin(data, session)
+    await handleLogin(data, session)
+    return {"[200]", "OTP enviado para email com sucesso"}
+
+
+# ROTAS PROTEGIDAS PARA ADMIN
+
+@app.get("/api/getall")
+def getbyall():
+    pass 
 
 @app.post('/api/verify-otp')
 async def verify_otp(email: str, otp: str):
-    pass
+    send_otp(email, otp)
 
 
 if __name__ == "__main__":
