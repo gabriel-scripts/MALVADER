@@ -1,9 +1,10 @@
+from fastapi import HTTPException
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.Usuario import Usuario
 
-from dao.BaseRepository import BaseRepository
+from dao.repository.BaseRepository import BaseRepository
 
 from typing import Optional, List
 
@@ -40,7 +41,11 @@ class UserRepository(BaseRepository[Usuario]):
             await self.db.refresh(novo_user)
             return novo_user
         except Exception as e:
-            print(f'Error to save user {e}')
+            await self.db.rollback()
+            if "Duplicate entry" in str(e):
+                raise HTTPException(status_code=400, detail="Email already exists.") 
+            print(f"Error to save user {e}")
+            return None
 
     async def update(self, id_usuario: int, usuario_user: dict) -> Optional[Usuario]:
         try:

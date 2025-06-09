@@ -1,5 +1,5 @@
 from sqlalchemy.future import select
-from dao.BaseRepository import BaseRepository
+from dao.repository.BaseRepository import BaseRepository
 from typing import List, Optional
 
 from models.Funcionario import Funcionario

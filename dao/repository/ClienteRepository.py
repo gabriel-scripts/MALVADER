@@ -1,7 +1,7 @@
 from typing import List, Optional
 from sqlalchemy import select
 
-from dao.BaseRepository import BaseRepository
+from dao.repository.BaseRepository import BaseRepository
 from models.Cliente import Cliente
 
 from typing import List, Optional
@@ -9,7 +9,7 @@ from sqlalchemy import select, update
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from dao.BaseRepository import BaseRepository
+from dao.repository.BaseRepository import BaseRepository
 from models.Cliente import Cliente
 
 class ClienteRepository(BaseRepository[Cliente]):
