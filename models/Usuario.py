@@ -19,8 +19,9 @@ class Usuario(Base):
 
     cliente = relationship("Cliente", back_populates="usuario", uselist=False)
     funcionarios = relationship("Funcionario", back_populates="usuario")
+    endereco = relationship("Endereco", back_populates="usuario", uselist=False)
 
-    def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash, email,):
+    def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash, email):
         self.nome = nome
         self.cpf = cpf
         self.data_nascimento = data_nascimento

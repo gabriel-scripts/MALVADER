@@ -6,23 +6,24 @@ class Endereco(Base):
     __tablename__ = 'endereco'
     
     id_endereco = Column(Integer, primary_key=True, autoincrement=True)
-    logradouro = Column(String(255), nullable=False)
-    numero = Column(String(10), nullable=False)
-    complemento = Column(String(255))
-    bairro = Column(String(100), nullable=False)
-    cidade = Column(String(100), nullable=False)
-    estado = Column(String(2), nullable=False)
+    id_usuario = Column(Integer, ForeignKey("usuario.id_usuario"), nullable=False)
+
     cep = Column(String(10), nullable=False)
+    local = Column(String(100), nullable=False)
+    numero_casa = Column(Integer, nullable=False)
+    complemento = Column(String(255))
+    bairro = Column(String(50), nullable=False)
+    cidade = Column(String(50), nullable=False)
+    estado = Column(String(2), nullable=False)
     
-    usuario_id = Column(Integer, ForeignKey('usuarios.id_usuario'))
+    usuario = relationship("Usuario", back_populates="endereco")
     
-    usuario = relationship("Usuario", back_populates="enderecos")
-    
-    def __init__(self, logradouro, numero, complemento, bairro, cidade, estado, cep):
-        self.logradouro = logradouro
-        self.numero = numero
+    def __init__(self, id_usuario, cep, local, numero_casa, complemento, bairro, cidade, estado):
+        self.id_usuario = id_usuario,
+        self.cep = cep
+        self.local = local
+        self.numero_casa = numero_casa
         self.complemento = complemento
         self.bairro = bairro
         self.cidade = cidade
         self.estado = estado
-        self.cep = cep
