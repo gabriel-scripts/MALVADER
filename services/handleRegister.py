@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 from dao.repository.UserRepository import UserRepository
 
-from services.validadeData import validate_data, cpf_exists, is_password_strong
+from services.validadeData import validate_data, cpf_exists, email_exists, is_password_strong
 
 from util.hashPassword import generate_hash
 from util.parseData.ParseToCliente import parseDataToCliente
@@ -41,6 +41,7 @@ async def handleRegister(user_data, session):
 
     await validate_data(user_data_dict)
     await cpf_exists(user_data_dict, user_repository)
+    await email_exists(user_data_dict, user_repository)
     await is_password_strong(user_data_dict["senha_hash"])
 
     user_data_dict["senha_hash"] = generate_hash(user_data_dict["senha_hash"])

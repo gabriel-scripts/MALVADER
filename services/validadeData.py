@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from util.isValidCpf import isValidCpf
 import re
 from datetime import date
+
 async def validate_data(user_data: dict):
     if user_data["tipo_usuario"] is None:
         raise HTTPException(status_code=400, detail="'tipo_usuario' cannot be null")
@@ -13,21 +14,20 @@ async def validate_data(user_data: dict):
         raise HTTPException(status_code=400, detail="Nome cannot be null")
     if not user_data.get("data_nascimento"):
         raise HTTPException(status_code=400, detail="'Data de nascimento' cannot be null")
-    if user_data.get("data_nascimento") != date:
-        raise HTTPException(status_code=400, detail="'Data de nascimento' date must be date time")
     if not user_data.get("telefone"):
         raise HTTPException(status_code=400, detail="'Telefone' cannot be null") 
 
     #validar endereco
-    #validar 
     
 async def cpf_exists(user_data, user_repository):
     existing = await user_repository.find_by_cpf(user_data["cpf"])
     if existing:
-        raise HTTPException(status_code=400, detail="Usuário already exists.")
+        raise HTTPException(status_code=400, detail="Cpf already exists.")
 
-async def email_exists():
-    pass
+async def email_exists(user_data, user_repository):
+    existing = await user_repository.find_by_email(user_data["email"])
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already exists.")
 
 async def is_password_strong(user_password: str):
     password_length = len(user_password)

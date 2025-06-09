@@ -33,6 +33,15 @@ class UserRepository(BaseRepository[Usuario]):
             print(f"Error to get cpf: {e}")
             return None
 
+    async def find_by_email(self, email):
+        try:
+            result = await self.db.execute(select(Usuario).where(Usuario.email == email))
+            email_usuario = result.scalars().first()
+            return email_usuario
+        except Exception as e:
+            print(f"Error to get email: {e}")
+            return None
+
     async def create(self, user_data: dict) -> Usuario:
         try:
             novo_user = Usuario(**user_data)
