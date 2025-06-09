@@ -2,6 +2,15 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date
 
+class Endereco(BaseModel):
+    cep: str
+    local: str
+    numero_casa: int
+    bairro: str
+    cidade: str 
+    estado: str
+    complemento: Optional[str] = None
+
 class UsuarioBase(BaseModel):
     nome: str
     cpf: str
@@ -13,3 +22,4 @@ class UsuarioBase(BaseModel):
     score_credito:  Optional[str] = None
     cargo:  Optional[str] = None
     id_supervisor:  Optional[str] = None
+    endereco: Endereco
