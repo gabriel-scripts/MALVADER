@@ -13,14 +13,14 @@ class Usuario(Base):
     telefone = Column(String(20))
     tipo_usuario = Column(String(20), nullable=False)
     senha_hash = Column(String(255), nullable=False)
-    otp_ativo = Column(Boolean, default=False)
+    otp_ativo = Column(String(6), default=False)
     otp_expiracao = Column(Date)
     email = Column(VARCHAR(255), unique=True, nullable=False)
 
     cliente = relationship("Cliente", back_populates="usuario", uselist=False)
     funcionarios = relationship("Funcionario", back_populates="usuario")
     endereco = relationship("Endereco", back_populates="usuario", uselist=False)
-
+    
     def __init__(self, nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash, email):
         self.nome = nome
         self.cpf = cpf
