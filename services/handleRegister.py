@@ -1,7 +1,8 @@
+from datetime import datetime
+
 from dao.repository.ClienteRepository import ClienteRepository
 from dao.repository.FuncionarioRepository import FuncionarioRepository
 from dao.repository.EnderecoRepository import EnderecoRepository
-from fastapi import HTTPException
 
 from dao.repository.UserRepository import UserRepository
 
@@ -12,6 +13,7 @@ from util.parseData.ParseToCliente import parseDataToCliente
 from util.parseData.parseDataFuncionario import parseDataToFuncionario
 from util.parseData.parseDataToUser import parseDataToUser
 from util.parseData.parseDataEndereco import parseDataEndereco
+from util.save_auditoria import save_auditoria
 
 async def registerUsuario(usuario: dict, session):
     user_repo = UserRepository(session)
@@ -45,7 +47,6 @@ async def handleRegister(user_data, session):
     await is_password_strong(user_data_dict["senha_hash"])
 
     user_data_dict["senha_hash"] = generate_hash(user_data_dict["senha_hash"])
-
     user_parsed_data = parseDataToUser(user_data_dict)
     
     if user_data_dict["tipo_usuario"] == 'cliente':
@@ -54,6 +55,16 @@ async def handleRegister(user_data, session):
         cliente_parsed_data = parseDataToCliente(user_data_dict, usuario_salvo)
         await registerCliente(cliente_parsed_data, session)
         await registerEndereco(endereco_parsed_data, session)
+
+        auditoria_data = {
+            "id_usuario": usuario_salvo.id_usuario,
+            "acao": "register_funcionario",
+            "data_hora": datetime.now(),
+            "detalhes": f"Usuário {usuario_salvo.email} registrado como funcionário."
+        }
+
+        await save_auditoria(session, auditoria_data)
+
         return {"200": "Cliente registed with success"}
 
     if user_data_dict["tipo_usuario"] == 'funcionario':
@@ -62,4 +73,14 @@ async def handleRegister(user_data, session):
         funcionario_parsed_data = parseDataToFuncionario(user_data_dict,  usuario_salvo)
         await registerFuncionario(funcionario_parsed_data, session)
         await registerEndereco(endereco_parsed_data, session)
+
+        auditoria_data = {
+            "id_usuario": usuario_salvo.id_usuario,
+            "acao": "register_funcionario",
+            "data_hora": datetime.now(),
+            "detalhes": f"Usuário {usuario_salvo.email} registrado como funcionário."
+        }
+        
+        await save_auditoria(session, auditoria_data)
+
         return {"200": "Funcionario registed with success"}
