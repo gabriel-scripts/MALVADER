@@ -4,6 +4,8 @@ import re
 from datetime import date
 
 async def validate_data(user_data: dict):
+    if not user_data["email"]: 
+        raise HTTPException(status_code=400, detail="'email' cannot be null")
     if user_data["tipo_usuario"] is None:
         raise HTTPException(status_code=400, detail="'tipo_usuario' cannot be null")
     if not isValidCpf(user_data["cpf"]):
@@ -16,8 +18,23 @@ async def validate_data(user_data: dict):
         raise HTTPException(status_code=400, detail="'Data de nascimento' cannot be null")
     if not user_data.get("telefone"):
         raise HTTPException(status_code=400, detail="'Telefone' cannot be null") 
+    
+    estado_length = len(user_data["endereco"]["estado"])
 
-    #validar endereco
+    if estado_length < 2:
+        raise HTTPException(status_code=400, detail="Estado must be 2 letters")
+    if not user_data["endereco"]["cep"]:
+        raise HTTPException(status_code=400, detail="Cep cannot be null")    
+    if not user_data["endereco"]["local"]:
+        raise HTTPException(status_code=400, detail="Local cannot be null")  
+    if not user_data["endereco"]["numero_casa"]:
+        raise HTTPException(status_code=400, detail="Numero_casa cannot be null")
+    if not user_data["endereco"]["bairro"]:
+        raise HTTPException(status_code=400, detail="Bairro cannot be null")    
+    if not user_data["endereco"]["cidade"]:
+        raise HTTPException(status_code=400, detail="Cidade cannot be null")  
+    if not user_data["endereco"]["estado"]:
+        raise HTTPException(status_code=400, detail="Estado cannot be null")
     
 async def cpf_exists(user_data, user_repository):
     existing = await user_repository.find_by_cpf(user_data["cpf"])
