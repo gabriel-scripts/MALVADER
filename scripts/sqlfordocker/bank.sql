@@ -137,18 +137,12 @@ CREATE TABLE relatorio (
 );
 
 DELIMITER $$
-
-CREATE TRIGGER depositar_emprestimo AFTER UPDATE ON emprestimo
-FOR EACH ROW
+CREATE PROCEDURE gerar_otp(IN id_usuario INT)
 BEGIN
-    IF NEW.status = 'APROVADO' AND OLD.status != 'APROVADO' THEN
-        INSERT INTO transacao (
-            id_conta_origem, tipo_transacao, valor, data_hora, descricao
-        )
-        VALUES (
-            NEW.id_conta, 'deposito', NEW.valor_solicitado, NOW(), CONCAT('Empréstimo ID ', NEW.id_emprestimo)
-        );
-    END IF;
+    DECLARE novo_otp VARCHAR(6);
+    SET novo_otp = LPAD(FLOOR(RAND() * 1000000), 6, '0');
+    UPDATE usuario SET otp_ativo = novo_otp, otp_expiracao = NOW() + INTERVAL 5 MINUTE
+    WHERE id_usuario = id_usuario;
+    SELECT novo_otp;
 END $$
-
 DELIMITER ;
