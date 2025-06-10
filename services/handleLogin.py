@@ -1,10 +1,30 @@
+from fastapi import HTTPException
 from services.validadeData import validate_data
-from util.hashPassword import verificar_senha
 
-async def handleLogin(senha):
+from util.verify_password import verify_password
+from util.send_otp import send_otp
+from util.generate_otp import generate_otp
+
+from dao.repository.UserRepository import UserRepository
+
+async def handleLogin(login_data, session):
+    login_dict = login_data.dict()
+    
+    print(login_data)
+
+    user_db = UserRepository(session)
+    user = await user_db.find_by_cpf(login_dict["cpf"])
+
+    print(user.__dict__)
+
+    if not user:
+        raise HTTPException(status_code=400, detail="User not exists")
+
     try: 
-        validate_data(senha)
-        verificar_senha(senha)
-
+        await verify_password(user.senha_hash, login_dict["senha"])
+        otp = await generate_otp(session, user.id_usuario)
+        if not otp:
+            raise HTTPException(status_code=400, detail="error to generate OTP")
+        await send_otp(user.email, otp)
     except Exception as e:
-        pass
+        print(f"erro: {e}")

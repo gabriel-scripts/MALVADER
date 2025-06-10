@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from util.isValidCpf import isValidCpf
+from util.is_cpf_valid import isValidCpf
 import re
 from datetime import date
 

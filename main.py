@@ -5,9 +5,12 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from dao.config.database import get_async_session 
+
 from services.handleRegister import handleRegister
 from services.handleLogin import handleLogin
+
 from models.pydantic.Usuario import UsuarioBase
+from models.pydantic.LoginBase import LoginBase
 
 from util.send_otp import send_otp
 
@@ -31,18 +34,18 @@ async def register_endpoint(form_data: UsuarioBase, session: AsyncSession = Depe
     return {"[200]", "User saved with success"}
 
 @app.post('/api/login')
-async def login_endpoint(data: UsuarioBase, session: AsyncSession = Depends( get_async_session )):
+async def login_endpoint(data: LoginBase, session: AsyncSession = Depends( get_async_session )):
     await handleLogin(data, session)
     return {"[200]", "OTP enviado para email com sucesso"}
 
 
-# ROTAS PROTEGIDAS PARA ADMIN
+# ROTAS DE TEST PARA ADMIN
 
 @app.get("/api/getall")
 def getbyall():
     pass 
 
-@app.post('/api/verify-otp')
+@app.post('/api/test-otp')
 async def verify_otp(email: str, otp: str):
     send_otp(email, otp)
 

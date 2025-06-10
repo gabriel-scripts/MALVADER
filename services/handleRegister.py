@@ -7,7 +7,7 @@ from dao.repository.UserRepository import UserRepository
 
 from services.validadeData import validate_data, cpf_exists, email_exists, is_password_strong
 
-from util.hashPassword import generate_hash
+from util.generate_hash import generate_hash
 from util.parseData.ParseToCliente import parseDataToCliente
 from util.parseData.parseDataFuncionario import parseDataToFuncionario
 from util.parseData.parseDataToUser import parseDataToUser

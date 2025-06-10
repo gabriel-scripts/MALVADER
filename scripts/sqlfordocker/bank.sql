@@ -9,7 +9,7 @@ CREATE TABLE usuario (
     telefone VARCHAR(15),
     tipo_usuario ENUM('cliente', 'funcionario', 'admin') NOT NULL,
     senha_hash VARCHAR(255) NOT NULL,
-    otp_ativo BOOLEAN DEFAULT FALSE,
+    otp_ativo VARCHAR(6),
     otp_expiracao DATETIME,
     PRIMARY KEY(id_usuario)
 );

@@ -27,8 +27,8 @@ class UserRepository(BaseRepository[Usuario]):
     async def find_by_cpf(self, cpf):
         try:
             result = await self.db.execute(select(Usuario).where(Usuario.cpf == cpf))
-            cpf_usuario = result.scalars().first()
-            return cpf_usuario
+            user = result.scalars().first()
+            return user
         except Exception as e:
             print(f"Error to get cpf: {e}")
             return None
