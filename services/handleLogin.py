@@ -9,13 +9,9 @@ from dao.repository.UserRepository import UserRepository
 
 async def handleLogin(login_data, session):
     login_dict = login_data.dict()
-    
-    print(login_data)
 
     user_db = UserRepository(session)
     user = await user_db.find_by_cpf(login_dict["cpf"])
-
-    print(user.__dict__)
 
     if not user:
         raise HTTPException(status_code=400, detail="User not exists")
