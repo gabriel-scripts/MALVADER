@@ -6,13 +6,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from dao.config.database import get_async_session 
 
-from services.handleRegister import handleRegister
+from services.handleRegister import handleRegister,register_funcionario
 from services.handleLogin import handleLogin
+from services.auth import auth
 
 from models.pydantic.Usuario import UsuarioBase
 from models.pydantic.LoginBase import LoginBase
+from models.pydantic.authBase import AuthBase
 
 from util.send_otp import send_otp
+from util.jwt.JWT import get_current_user
 
 app = FastAPI()
 
@@ -33,11 +36,20 @@ async def register_endpoint(form_data: UsuarioBase, session: AsyncSession = Depe
     await handleRegister(form_data, session)
     return {"[200]", "User saved with success"}
 
+@app.post('/api/register_funcionario')
+async def register_funcionario_endpoint(form_data: UsuarioBase, session: AsyncSession = Depends(get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+    await register_funcionario(form_data, session, usuario_ativo_sistema)
+    return {"[200]", "Funcionario registed with succes"}
+
 @app.post('/api/login')
 async def login_endpoint(data: LoginBase, session: AsyncSession = Depends( get_async_session )):
     await handleLogin(data, session)
-    return {"[200]", "OTP enviado para email com sucesso"}
+    return {"[200]", "OTP sended to email"}
 
+@app.post('/api/authenticate_user')
+async def authenticate_user(user: AuthBase, session: AsyncSession = Depends( get_async_session)):
+    response = await auth(user, session)
+    return response
 
 # ROTAS DE TEST PARA ADMIN
 
@@ -48,7 +60,6 @@ def getbyall():
 @app.post('/api/test-otp')
 async def verify_otp(email: str, otp: str):
     send_otp(email, otp)
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

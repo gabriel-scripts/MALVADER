@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from services.validadeData import validate_data
 
 from util.verify_password import verify_password
 from util.send_otp import send_otp

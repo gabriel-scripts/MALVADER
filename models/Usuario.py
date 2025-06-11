@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date,  Boolean, VARCHAR
+from sqlalchemy import Column, DateTime, Integer, String, Date, VARCHAR
 from sqlalchemy.orm import relationship
 
 from dao.config.database import Base
@@ -16,6 +16,9 @@ class Usuario(Base):
     otp_ativo = Column(String(6), default=False)
     otp_expiracao = Column(Date)
     email = Column(VARCHAR(255), unique=True, nullable=False)
+
+    #tentativas_login = Column(Integer, default=0)
+    #bloqueado_ate = Column(DateTime, nullable=True)
 
     cliente = relationship("Cliente", back_populates="usuario", uselist=False)
     funcionarios = relationship("Funcionario", back_populates="usuario")

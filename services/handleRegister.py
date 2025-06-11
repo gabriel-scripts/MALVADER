@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from fastapi import HTTPException
+
 from dao.repository.ClienteRepository import ClienteRepository
 from dao.repository.FuncionarioRepository import FuncionarioRepository
 from dao.repository.EnderecoRepository import EnderecoRepository
@@ -49,6 +51,10 @@ async def handleRegister(user_data, session):
     user_data_dict["senha_hash"] = generate_hash(user_data_dict["senha_hash"])
     user_parsed_data = parseDataToUser(user_data_dict)
     
+    if user_data_dict["tipo_usuario"] == 'admin':
+        raise HTTPException(status_code=403, detail="Invalid user type")
+
+
     if user_data_dict["tipo_usuario"] == 'cliente':
         usuario_salvo = await registerUsuario(user_parsed_data, session)                
         endereco_parsed_data = parseDataEndereco(user_data_dict, usuario_salvo.id_usuario)
@@ -60,27 +66,46 @@ async def handleRegister(user_data, session):
             "id_usuario": usuario_salvo.id_usuario,
             "acao": "register_funcionario",
             "data_hora": datetime.now(),
-            "detalhes": f"Usuário {usuario_salvo.email} registrado como funcionário."
+            "detalhes": f"Usuário {usuario_salvo.email} registrado como cliente."
         }
 
         await save_auditoria(session, auditoria_data)
 
         return {"200": "Cliente registed with success"}
 
-    if user_data_dict["tipo_usuario"] == 'funcionario':
-        #falta validar a hierarquia
-        usuario_salvo = await registerUsuario(user_parsed_data, session)
-        funcionario_parsed_data = parseDataToFuncionario(user_data_dict,  usuario_salvo)
-        await registerFuncionario(funcionario_parsed_data, session)
-        await registerEndereco(endereco_parsed_data, session)
 
-        auditoria_data = {
-            "id_usuario": usuario_salvo.id_usuario,
-            "acao": "register_funcionario",
-            "data_hora": datetime.now(),
-            "detalhes": f"Usuário {usuario_salvo.email} registrado como funcionário."
-        }
+async def register_funcionario(user_data, session, current_user):
         
-        await save_auditoria(session, auditoria_data)
+        user_data_dict = user_data.dict()
+        await validate_data(user_data_dict)
 
-        return {"200": "Funcionario registed with success"}
+        print("current user",current_user) # DEBUG APAGAR DEPOIS 
+
+        user_parsed_data = parseDataToUser(user_data_dict)
+
+        if not current_user:
+            raise HTTPException(status_code=403, detail="Error to get token")
+
+        if not current_user["tipo_usuario"] == 'admin':
+            raise HTTPException(status_code=403, detail="Apenas admin ou gerente podem cadastrar funcionários.")
+
+        if not current_user["tipo_usuario"] == 'gerente':
+            raise HTTPException(status_code=403, detail="Apenas admin ou gerente podem cadastrar funcionários.")
+
+        if user_data_dict["tipo_usuario"] == 'funcionario':
+            usuario_salvo = await registerUsuario(user_parsed_data, session)
+            endereco_parsed_data = parseDataEndereco(user_data_dict, usuario_salvo.id_usuario)
+            funcionario_parsed_data = parseDataToFuncionario(user_data_dict,  usuario_salvo)
+            await registerFuncionario(funcionario_parsed_data, session)
+            await registerEndereco(endereco_parsed_data, session)
+
+            auditoria_data = {
+                "id_usuario": usuario_salvo.id_usuario,
+                "acao": "register_funcionario",
+                "data_hora": datetime.now(),
+                "detalhes": f"Usuário {usuario_salvo.email} registrado como funcionário."
+            }
+            
+            await save_auditoria(session, auditoria_data)
+
+            return {"200": "Funcionario registed with success"}

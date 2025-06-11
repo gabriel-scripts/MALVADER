@@ -1,12 +1,17 @@
-from dao.UserRepository import UserRepository
-from dao.config.database import SessionLocal
+from dao.repository.UserRepository import UserRepository
+from dao.config.database import get_async_session
 from dao.config.createTables import create_tables
+from dao.repository.EnderecoRepository import EnderecoRepository
 
-create_tables()
 
-def test():
-    db = SessionLocal()
-    user = UserRepository(db)
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
+
+def test(session: AsyncSession = Depends(get_async_session)):
+
+    user = UserRepository(session)
+    endereco = EnderecoRepository(session)
+
     user_data = {
         "nome": "Teste",
         "cpf": "12345678901",
@@ -16,7 +21,17 @@ def test():
         "senha_hash": "hash123"
     }
 
-    user.create(user_data) 
-    pass
+    endereco = {
+        "id_usuario": 1,
+        "cep": "TEST",
+        "local": "TEST",
+        "numero_casa": 123,
+        "bairro": "TEST",
+        "cidade": "TEST",
+        "estado": "TEST",
+        "complemento": "TEST"
+    }
+    endereco.create(endereco)
+    
 
 test()
