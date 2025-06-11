@@ -6,20 +6,9 @@ class Funcionario(Base):
     __tablename__ = 'funcionario'
     id_funcionario= Column(Integer, primary_key=True, autoincrement=True)
     
-    nome = Column(String(100), nullable=False)
     codigo_funcionario = Column(String(11), unique=True, nullable=False)
-    data_nascimento = Column(Date)
     cargo = Column(String(20), nullable=False)
     id_usuario = Column(Integer, ForeignKey("usuario.id_usuario"), nullable=False)
     id_supervisor = Column(String(20), nullable=False)
-    senha_hash = Column(String(255), nullable=False, unique=True)
 
     usuario = relationship("Usuario", back_populates="funcionarios", uselist=False) 
-    
-    def __init__(self, nome, codigo_funcionario, data_nascimento, cargo, id_usuario, id_supervisor):
-        self.nome = nome
-        self.codigo_funcionario = codigo_funcionario
-        self.data_nascimento = data_nascimento
-        self.cargo = cargo
-        self.id_supervisor = id_supervisor
-        self.id_usuario = id_usuario

@@ -8,9 +8,12 @@ from dao.repository.EnderecoRepository import EnderecoRepository
 
 from dao.repository.UserRepository import UserRepository
 
+from services.validateCurrentUser import validate_current_user
 from services.validadeData import validate_data, cpf_exists, email_exists, is_password_strong
 
-from util.generate_hash import generate_hash
+from util.generate.generate_hash import generate_hash
+from util.generate.generate_codigo_funcionario import generate_codigo_funcionario
+
 from util.parseData.ParseToCliente import parseDataToCliente
 from util.parseData.parseDataFuncionario import parseDataToFuncionario
 from util.parseData.parseDataToUser import parseDataToUser
@@ -40,7 +43,6 @@ async def registerEndereco(endereco: dict, session):
 async def handleRegister(user_data, session):
     
     user_data_dict = user_data.dict()
-
     user_repository = UserRepository(session)
 
     await validate_data(user_data_dict)
@@ -53,7 +55,6 @@ async def handleRegister(user_data, session):
     
     if user_data_dict["tipo_usuario"] == 'admin':
         raise HTTPException(status_code=403, detail="Invalid user type")
-
 
     if user_data_dict["tipo_usuario"] == 'cliente':
         usuario_salvo = await registerUsuario(user_parsed_data, session)                
@@ -75,27 +76,31 @@ async def handleRegister(user_data, session):
 
 
 async def register_funcionario(user_data, session, current_user):
-        
+        print("current user", current_user) # DEBUG APAGAR DEPOIS 
         user_data_dict = user_data.dict()
+        user_repository = UserRepository(session)
+        
+        current_funcionario_repository = FuncionarioRepository(session)
+        supervisor = await current_funcionario_repository.find_by_codigo(current_user["codigo_funcionario"])
+        
+        if not supervisor: 
+            raise HTTPException(status_code=403, detail="Supervisor not found on database")
+        
         await validate_data(user_data_dict)
+        await validate_current_user(current_user)
+        await cpf_exists(user_data_dict, user_repository)
+        await email_exists(user_data_dict, user_repository)
+        
 
-        print("current user",current_user) # DEBUG APAGAR DEPOIS 
-
+        user_data_dict["senha_hash"] = generate_hash(user_data_dict["senha_hash"])
+        user_data_dict["codigo_funcionario"] = await generate_codigo_funcionario(session)
         user_parsed_data = parseDataToUser(user_data_dict)
-
-        if not current_user:
-            raise HTTPException(status_code=403, detail="Error to get token")
-
-        if not current_user["tipo_usuario"] == 'admin':
-            raise HTTPException(status_code=403, detail="Apenas admin ou gerente podem cadastrar funcionários.")
-
-        if not current_user["tipo_usuario"] == 'gerente':
-            raise HTTPException(status_code=403, detail="Apenas admin ou gerente podem cadastrar funcionários.")
 
         if user_data_dict["tipo_usuario"] == 'funcionario':
             usuario_salvo = await registerUsuario(user_parsed_data, session)
             endereco_parsed_data = parseDataEndereco(user_data_dict, usuario_salvo.id_usuario)
-            funcionario_parsed_data = parseDataToFuncionario(user_data_dict,  usuario_salvo)
+            funcionario_parsed_data = parseDataToFuncionario(user_data_dict, usuario_salvo.id_usuario, supervisor.id_funcionario) # id_supervisor
+            
             await registerFuncionario(funcionario_parsed_data, session)
             await registerEndereco(endereco_parsed_data, session)
 

@@ -1,11 +1,8 @@
-def parseDataToFuncionario(user_data,  usuario_objeto):
+def parseDataToFuncionario(user_data,  id_usuario, id_supervisor):
     funcinario = {
-        "nome": user_data["nome"],
+        "id_usuario": id_usuario,
         "codigo_funcionario": user_data["codigo_funcionario"],
-        "data_nascimento": user_data["data_nascimento"],
         "cargo": user_data["cargo"],
-        "id_usuario": user_data["id_usuario"],
-        "senha_hash": user_data["senha_hash"],
-        "usuario": usuario_objeto,
+        "id_supervisor": id_supervisor
     }
     return funcinario

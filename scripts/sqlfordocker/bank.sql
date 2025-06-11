@@ -146,3 +146,14 @@ BEGIN
     SELECT novo_otp;
 END $$
 DELIMITER ;
+
+
+-- gerar código funcionario
+DELIMITER $$
+CREATE PROCEDURE gerar_codigo()
+BEGIN
+    DECLARE codigo VARCHAR(11);
+    SET codigo = LPAD(FLOOR(RAND() * 1000000), 6, '0');
+    SELECT codigo;
+END $$
+DELIMITER ;

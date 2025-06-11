@@ -27,6 +27,7 @@ async def auth(auth_input, session):
     if user.tipo_usuario == 'cliente':
         data = {
             "id_usuario": user.id_usuario,
+            "cpf": user.cpf,
             "email": user.email,
             "codigo_funcionario": None,
             "tipo_usuario": user.tipo_usuario,

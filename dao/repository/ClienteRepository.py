@@ -9,7 +9,6 @@ from sqlalchemy import select, update
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from dao.repository.BaseRepository import BaseRepository
 from models.Cliente import Cliente
 
 class ClienteRepository(BaseRepository[Cliente]):

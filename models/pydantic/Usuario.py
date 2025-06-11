@@ -22,4 +22,5 @@ class UsuarioBase(BaseModel):
     score_credito:  Optional[str] = None
     cargo:  Optional[str] = None
     id_supervisor:  Optional[str] = None
+    codigo_funcionario:  Optional[str] = None
     endereco: Endereco
