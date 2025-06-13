@@ -1,5 +1,3 @@
-from models.Usuario import Usuario
-
 def parseDataToUser(data):
     usuario = {
         "nome": data["nome"],

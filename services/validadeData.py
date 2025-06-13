@@ -4,6 +4,44 @@ import re
 from datetime import date
 
 async def validate_data(user_data: dict):
+
+    estado_length = len(user_data["endereco"]["estado"])
+    cpf_length = len(user_data["cpf"])
+    telefone_length = len(user_data.get("telefone"))
+    cep_length = len(user_data["endereco"]["cep"])
+    local_length = len(user_data["endereco"]["local"])
+    numero_casa_length = len(str(user_data["endereco"]["numero_casa"]))
+    bairro_length = len(user_data["endereco"]["bairro"])
+    cidade_lenth = len(user_data["endereco"]["cidade"])
+    complemento_length = len(user_data["endereco"]["complemento"])
+
+    if estado_length != 2:
+        raise HTTPException(status_code=400, detail="Estado only have 2 caracteres")
+
+    if cpf_length != 11:
+        raise HTTPException(status_code=400, detail="CPF only have 11 caracteres")
+
+    if telefone_length > 15:
+        raise HTTPException(status_code=400, detail="Telefone only have 15 caracteres")
+
+    if cep_length != 8:
+        raise HTTPException(status_code=400, detail="Cep need to have 8 caracteres")
+
+    if local_length > 100:
+        raise HTTPException(status_code=400, detail="Local only have 100 caracteres")
+
+    if numero_casa_length > 100:
+        raise HTTPException(status_code=400, detail="Numero casa only have 10 caracteres")
+
+    if bairro_length > 50:
+        raise HTTPException(status_code=400, detail="Bairro only have 50 caracteres")
+
+    if complemento_length > 50:
+        raise HTTPException(status_code=400, detail="Complemento only have 100 caracteres")
+
+    if cidade_lenth > 50:
+        raise HTTPException(status_code=400, detail="Cidade only have 50 caracteres")
+
     if not user_data["email"]: 
         raise HTTPException(status_code=400, detail="'email' cannot be null")
     if user_data["tipo_usuario"] is None:
@@ -19,10 +57,6 @@ async def validate_data(user_data: dict):
     if not user_data.get("telefone"):
         raise HTTPException(status_code=400, detail="'Telefone' cannot be null") 
     
-    estado_length = len(user_data["endereco"]["estado"])
-
-    if estado_length < 2:
-        raise HTTPException(status_code=400, detail="Estado must be 2 letters")
     if not user_data["endereco"]["cep"]:
         raise HTTPException(status_code=400, detail="Cep cannot be null")    
     if not user_data["endereco"]["local"]:

@@ -10,6 +10,7 @@ from services.handleRegister import handleRegister,register_funcionario
 from services.handleLogin import handleLogin
 from services.auth import auth
 
+from models.pydantic.LoginFuncionario import LoginFuncionario
 from models.pydantic.Usuario import UsuarioBase
 from models.pydantic.LoginBase import LoginBase
 from models.pydantic.authBase import AuthBase
@@ -41,6 +42,11 @@ async def register_funcionario_endpoint(form_data: UsuarioBase, session: AsyncSe
     await register_funcionario(form_data, session, usuario_ativo_sistema)
     return {"[200]", "Funcionario registed with succes"}
 
+@app.post('/api/login_funcionario')
+async def login_endpoint(data: LoginFuncionario, session: AsyncSession = Depends( get_async_session )):
+    await handleLogin(data, session)
+    return {"[200]", "OTP sended to email"}
+
 @app.post('/api/login')
 async def login_endpoint(data: LoginBase, session: AsyncSession = Depends( get_async_session )):
     await handleLogin(data, session)
@@ -50,6 +56,14 @@ async def login_endpoint(data: LoginBase, session: AsyncSession = Depends( get_a
 async def authenticate_user(user: AuthBase, session: AsyncSession = Depends( get_async_session)):
     response = await auth(user, session)
     return response
+
+@app.post('/api/abrir_conta_cliente')
+async def abrir_conta(user: AuthBase, session: AsyncSession = Depends( get_async_session)):
+    pass
+
+@app.post('/api/abrir_conta_funcionario')
+async def abrir_conta(user: AuthBase, session: AsyncSession = Depends( get_async_session)):
+    pass
 
 # ROTAS DE TEST PARA ADMIN
 
