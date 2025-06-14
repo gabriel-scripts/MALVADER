@@ -24,9 +24,12 @@ class ClienteRepository(BaseRepository[Cliente]):
         result = await self.db.execute(select(Cliente).where(Cliente.id_cliente == id_cliente))
         return result.scalars().first()
     
-    async def find_by_cpf(self, cpf):
-        result = await self.db.execute(select(Cliente).where(Cliente.cpf == cpf))
-        return result.scalars().first()
+    async def find_by_user_id(self, id_usuario: str) -> Optional[Cliente]:
+        try:
+            result = await self.db.execute(select(Cliente).where(Cliente.id_usuario == id_usuario))
+            return result.scalars().first()
+        except Exception as e:
+            print(e)
 
     async def create(self, cliente_data: dict) -> Cliente:
         try:

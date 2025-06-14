@@ -9,9 +9,9 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from dao.repository.BaseRepository import BaseRepository
-from models.Conta.Corrente import Corrente
+from models.ContaModel.Corrente import Corrente
 
-class ContaRepository(BaseRepository[Corrente]):
+class CorrenteRepository(BaseRepository[Corrente]):
     def __init__(self, db: AsyncSession):
         super().__init__(db)
 

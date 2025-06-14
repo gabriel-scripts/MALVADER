@@ -9,7 +9,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from dao.repository.BaseRepository import BaseRepository
-from models.Conta.Conta import Conta
+from models.ContaModel.Conta import Conta
 
 class ContaRepository(BaseRepository[Conta]):
     def __init__(self, db: AsyncSession):
@@ -28,6 +28,10 @@ class ContaRepository(BaseRepository[Conta]):
             return novo_conta
         except Exception as e:
             print(e)
+
+    async def find_by_cliente_id(self, id_cliente: str) -> Optional[Conta]:
+        result = await self.db.execute(select(Conta).where(Conta.id_cliente == id_cliente))
+        return result.scalars().first()
 
     async def update(self) -> Optional[Conta]:
         pass

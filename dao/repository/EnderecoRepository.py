@@ -30,6 +30,13 @@ class EnderecoRepository(BaseRepository[Endereco]):
         except Exception as e:
             print(e)
 
+    async def find_by_user_id(self, id_usuario: str) -> Optional[Endereco]:
+        try:
+            result = await self.db.execute(select(Endereco).where(Endereco.id_usuario == id_usuario))
+            return result.scalars().first()
+        except Exception as e:
+            print(e)
+            
     async def update(self) -> Optional[Endereco]:
         pass
 

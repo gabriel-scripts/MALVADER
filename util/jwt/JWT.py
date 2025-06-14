@@ -35,15 +35,25 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         cargo = payload.get("cargo")
         codigo_funcionario = payload.get("codigo_funcionario")
         cpf = payload.get("cpf")
+        email = payload.get("email")
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token")
+        
+        if tipo_usuario == 'cliente':
+            user = {
+                "id_usuario": user_id,
+                "tipo_usuario": tipo_usuario,
+                "cpf": cpf,
+                "email": email
+            }
 
-        user = {
-            "id_usuario": user_id,
-            "tipo_usuario": tipo_usuario,
-            "cargo": cargo,
-            "codigo_funcionario": codigo_funcionario,
-            "cpf": cpf
+        if tipo_usuario == 'funcionario':
+            user = {
+                "id_usuario": user_id,
+                "tipo_usuario": tipo_usuario,
+                "cargo": cargo,
+                "codigo_funcionario": codigo_funcionario,
+                "cpf": cpf
             }
 
         return user

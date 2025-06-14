@@ -9,5 +9,3 @@ class Poupanca(Base):
     id_conta = Column(Integer, ForeignKey("conta.id_conta"), unique=True, nullable=False)
     taxa_rendimento = Column(DECIMAL(5,4), nullable=False)
     ultimo_rendimento = Column(Date)
-
-    conta = relationship("Conta", back_populates="poupanca")

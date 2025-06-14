@@ -45,10 +45,9 @@ async def handleRegister(user_data, session):
     
     await validate_data(user_data.dict())
 
-    print("input: ", user_data.dict())
-
     user_data_dict = parseInput(user_data.dict())
     print("clear data:", user_data_dict)
+
     user_repository = UserRepository(session)
 
     await validate_data(user_data_dict)
@@ -83,8 +82,10 @@ async def handleRegister(user_data, session):
 
 async def register_funcionario(user_data, session, current_user):
         await validate_data(user_data.dict())
+            
+        if not current_user["codigo_funcionario"] or current_user["cargo"]:
+            raise HTTPException(status_code=403, detail="Supervisor not found on database")
         
-        print("current user", current_user) # DEBUG APAGAR DEPOIS 
 
         user_data_dict = parseInput(user_data.dict())
         user_repository = UserRepository(session)

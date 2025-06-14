@@ -136,6 +136,43 @@ CREATE TABLE relatorio (
     FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
 );
 
+-- calcular Score de credito
+
+DELIMITER $$
+CREATE PROCEDURE calcular_score_credito(IN id_cliente INT)
+BEGIN
+    DECLARE total_trans DECIMAL(15,2);
+    DECLARE media_trans DECIMAL(15,2);
+    SELECT SUM(valor), AVG(valor) INTO total_trans, media_trans
+    FROM transacao t
+    JOIN conta c ON t.id_conta_origem = c.id_conta
+    WHERE c.id_cliente = id_cliente AND t.tipo_transacao IN ('DEPOSITO', 'SAQUE');
+    UPDATE cliente SET score_credito = LEAST(100, (total_trans / 1000) + (media_trans / 100))
+    WHERE id_cliente = id_cliente;
+END $$
+DELIMITER ;
+
+
+-- atualizar saldo
+
+DELIMITER $$
+CREATE TRIGGER atualizar_saldo AFTER INSERT ON transacao
+FOR EACH ROW
+BEGIN
+    IF NEW.tipo_transacao = 'DEPOSITO' THEN
+        UPDATE conta SET saldo = saldo + NEW.valor WHERE id_conta = NEW.id_conta_origem;
+    ELSEIF NEW.tipo_transacao IN ('SAQUE', 'TAXA') THEN
+        UPDATE conta SET saldo = saldo - NEW.valor WHERE id_conta = NEW.id_conta_origem;
+    ELSEIF NEW.tipo_transacao = 'TRANSFERENCIA' THEN
+        UPDATE conta SET saldo = saldo - NEW.valor WHERE id_conta = NEW.id_conta_origem;
+        UPDATE conta SET saldo = saldo + NEW.valor WHERE id_conta = NEW.id_conta_destino;
+    END IF;
+END $$
+DELIMITER ;
+
+
+-- gerar OTP
+
 DELIMITER $$
 CREATE PROCEDURE gerar_otp(IN id_usuario INT)
 BEGIN
@@ -153,6 +190,27 @@ DELIMITER $$
 CREATE PROCEDURE gerar_codigo()
 BEGIN
     DECLARE codigo VARCHAR(11);
+    SET codigo = LPAD(FLOOR(RAND() * 1000000), 6, '0');
+    SELECT codigo;
+END $$
+DELIMITER ;
+
+-- gerar taxa manutenção
+DELIMITER $$
+CREATE PROCEDURE gerar_taxa_manutencao()
+BEGIN
+    DECLARE taxa DECIMAL(5,2);
+    SET taxa = ROUND(5 + (RAND() * 15), 2);
+    SELECT taxa;
+END $$
+DELIMITER ;
+
+
+-- gerar numero conta
+DELIMITER $$
+CREATE PROCEDURE gerar_numero_conta()
+BEGIN
+    DECLARE codigo VARCHAR(20);
     SET codigo = LPAD(FLOOR(RAND() * 1000000), 6, '0');
     SELECT codigo;
 END $$
