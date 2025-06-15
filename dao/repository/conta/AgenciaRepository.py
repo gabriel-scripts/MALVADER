@@ -29,6 +29,12 @@ class AgenciaRepository(BaseRepository[Agencia]):
         except Exception as e:
             print(e)
 
+    async def find_by_codigo_agencia(self, codigo_agencia: str) -> Optional[Agencia]:
+        result = await self.db.execute(
+            select(Agencia).where(Agencia.codigo_agencia == codigo_agencia)
+        )
+        return result.scalars().first()
+
     async def update(self) -> Optional[Agencia]:
         pass
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from fastapi import HTTPException
 from sqlalchemy import text
@@ -32,19 +32,89 @@ async def gerar_taxa(session):
     if row:
         return row[0]
 
+def parse_data_to_agencia(input_data_dict, id_endereco):
+    agencia = {
+        "nome": input_data_dict["agencia"]["nome"],
+        "codigo_agencia": input_data_dict["agencia"]["codigo_agencia"],
+        "endereco_id": id_endereco,
+    }
+    return agencia
+
+async def parse_data_to_account(session, input_data_dict, id_da_agencia, id_cliente):
+    conta = {
+        "numero_conta": await gerar_numero_conta(session),
+        "id_agencia": id_da_agencia,
+        "tipo_conta": input_data_dict["tipo_conta"],
+        "data_abertura": datetime.now(),
+        "id_cliente": id_cliente,
+        "saldo": Decimal('0.00'),
+        "status": "ativa"
+    }
+    return conta
+
+async def conta_type(input_data_dict, session, conta_criada):
+    if input_data_dict["tipo_conta"] not in ['poupanca', 'corrente', 'investimento']:
+         raise HTTPException(status_code=400, detail="Conta must be 'poupanca', 'corrente', 'investimento'")
+
+    conta_corrente_db = CorrenteRepository(session)
+    conta_investimento_db = InvestimentoRepository(session)
+    conta_poupanca_db = PoupancaRepository(session)
+
+    if input_data_dict["tipo_conta"] == 'poupanca':
+        if input_data_dict["perfil_risco"] != None:
+            raise HTTPException(status_code=400, detail="Account don´t have risk perfil.")
+        
+        poupanca = {
+            "id_conta": conta_criada.id_conta,
+            "taxa_rendimento": Decimal('0.005'),
+            "ultimo_rendimento": datetime.now().date() 
+        }
+        await conta_poupanca_db.create(poupanca)
+
+    
+    if input_data_dict["tipo_conta"] == 'corrente':
+
+        if input_data_dict["perfil_risco"] != None:
+            raise HTTPException(status_code=400, detail="Account don´t have risk perfil.")
+
+        corrente = {
+            "id_conta": conta_criada.id_conta,
+            "limite": Decimal(10000.0000), 
+            "data_vencimento": datetime.now() + timedelta(weeks=120),  
+            "taxa_manutencao": await gerar_taxa(session) 
+        }
+        await conta_corrente_db.create(corrente)
+
+    if input_data_dict["tipo_conta"] == 'investimento':
+        if not input_data_dict["perfil_risco"]:
+             raise HTTPException(status_code=400, detail="Account need a risk perfil")
+
+        investimento = {
+            "id_conta": conta_criada.id_conta,
+            "perfil_risco": input_data_dict["perfil_risco"], 
+            "valor_minimo": Decimal('1000.00'),
+            "taxa_rendimento_base": Decimal('0.01') 
+        }
+        await conta_investimento_db.create(investimento)
+
+async def create_agencia(session, input_data_dict, id_endereco):
+    agencia_db = AgenciaRepository(session)
+    agencia = parse_data_to_agencia(input_data_dict, id_endereco)
+    return await agencia_db.create(agencia)
+
+async def buscar_agencia(session, codigo_agencia):
+    agencia_db = AgenciaRepository(session)
+    agencia = await agencia_db.find_by_codigo_agencia(codigo_agencia)
+    return agencia
+    
 async def create_conta(input_data, session, current_user):
-    print("create_conta:", current_user)
+    input_data_dict = input_data.dict()
     
     user_db_current = UserRepository(session)
     endereco_db_current = EnderecoRepository(session)
     cliente_db = ClienteRepository(session)
-
     conta_db = ContaRepository(session)
-    conta_corrente_db = CorrenteRepository(session)
-    conta_investimento_db = InvestimentoRepository(session)
-    conta_poupanca_db = PoupancaRepository(session)
-    agencia_db = AgenciaRepository(session)
-
+    
     user_current = await user_db_current.find_by_cpf(current_user["cpf"])
     endereco = await endereco_db_current.find_by_user_id(user_current.id_usuario)
     cliente = await cliente_db.find_by_user_id(user_current.id_usuario)
@@ -52,66 +122,20 @@ async def create_conta(input_data, session, current_user):
 
     if conta != None:
         raise HTTPException(status_code=400, detail="Conta alredy exists")
+        
+    agencia = await buscar_agencia(session, input_data_dict["agencia"]["codigo_agencia"])
 
-    input_data_dict = input_data.dict()
+    if not agencia:
+        agencia = await create_agencia(session, input_data_dict, endereco.id_endereco)
+        if not agencia:
+            raise HTTPException(status_code=400, detail="Fail to register agencia")
 
-    input_data_dict["numero_conta"] = await gerar_numero_conta(session)
-    input_data_dict["data_abertura"] = datetime.now()
-    input_data_dict["status"] = "ativa"
-    input_data_dict["saldo"] = Decimal('0.00')
+    id_agencia = agencia.id_agencia
 
-    input_data_dict["agencia"]["endereco_id"] = endereco.id_endereco
-    agencia = {
-        "nome": input_data_dict["agencia"]["nome"],
-        "codigo_agencia": input_data_dict["agencia"]["codigo_agencia"],
-        "endereco_id": input_data_dict["agencia"]["endereco_id"],
-    }
-
-    agencia_nova = await agencia_db.create(agencia)
-
-    if not agencia_nova:
-        raise HTTPException(status_code=400, detail="Fail to register agencia")
-    
-    conta = {
-        "numero_conta": input_data_dict["numero_conta"],
-        "id_agencia": agencia_nova.id_agencia,
-        "data_abertura": input_data_dict["data_abertura"],
-        "status": input_data_dict["status"],
-        "saldo": input_data_dict["saldo"],
-        "id_cliente": cliente.id_cliente
-    }
-
-    conta_criada = await conta_db.create(input_data_dict)
+    conta = await parse_data_to_account(session, input_data_dict, id_agencia, cliente.id_cliente)
+    conta_criada = await conta_db.create(conta)
 
     if not conta_criada:
-        raise HTTPException(status_code=400, detail="Fail to create account")
-    
-    if input_data_dict["tipo_conta"] not in ['poupanca', 'corrente', 'investimento']:
-         raise HTTPException(status_code=400, detail="Conta must be 'poupanca' 'corrente' 'investimento'")
+        raise HTTPException(status_code=400, detail="Fail to create bank create account")
 
-    if input_data_dict["tipo_conta"] == 'poupanca':
-        poupanca = {
-            "id_conta": conta_criada.id_conta,
-            "taxa_redimento": Decimal,
-            "ultimo_rendimento": datetime
-        }
-        conta_poupanca_db.create(poupanca)
-
-    
-    if input_data_dict["tipo_conta"] == 'corrente':
-        corrente = {
-            "id_conta": conta_criada.id_conta,
-            "limite": Decimal(10000.0000), 
-            "data_vencimento": datetime, # FRONT
-            "taxa_manutencao": gerar_taxa()
-        }
-        conta_corrente_db.create(corrente)
-
-    if input_data_dict["tipo_conta"] == 'investimento':
-        investimento = {
-            "id_conta": conta_criada.id_conta,
-            "perfil_risco": "conservador", # FRONT
-            "valor_minimo": Decimal, 
-            "taxa_redimento_base": Decimal
-        }
-        conta_investimento_db.create(investimento)
+    await conta_type(input_data_dict, session, conta_criada)

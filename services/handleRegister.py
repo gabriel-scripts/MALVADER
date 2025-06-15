@@ -42,10 +42,11 @@ async def registerEndereco(endereco: dict, session):
     return endereco
 
 async def handleRegister(user_data, session):
-    
+
     await validate_data(user_data.dict())
 
     user_data_dict = parseInput(user_data.dict())
+    print(user_data_dict)
     print("clear data:", user_data_dict)
 
     user_repository = UserRepository(session)
@@ -81,13 +82,14 @@ async def handleRegister(user_data, session):
 
 
 async def register_funcionario(user_data, session, current_user):
-        await validate_data(user_data.dict())
-            
-        if not current_user["codigo_funcionario"] or current_user["cargo"]:
-            raise HTTPException(status_code=403, detail="Supervisor not found on database")
-        
+    
+        print("register_funcionario CURRENT_USER:", current_user)
 
+        await validate_data(user_data.dict())
         user_data_dict = parseInput(user_data.dict())
+
+        print("register_funcionario user_data_dict:", user_data_dict)
+
         user_repository = UserRepository(session)
         
         current_funcionario_repository = FuncionarioRepository(session)
@@ -108,7 +110,7 @@ async def register_funcionario(user_data, session, current_user):
         if user_data_dict["tipo_usuario"] == 'funcionario':
             usuario_salvo = await registerUsuario(user_parsed_data, session)
             endereco_parsed_data = parseDataEndereco(user_data_dict, usuario_salvo.id_usuario)
-            funcionario_parsed_data = parseDataToFuncionario(user_data_dict, usuario_salvo.id_usuario, supervisor.id_funcionario) # id_supervisor
+            funcionario_parsed_data = parseDataToFuncionario(user_data_dict, usuario_salvo.id_usuario, supervisor.id_funcionario)
             
             try:
                 await registerFuncionario(funcionario_parsed_data, session)

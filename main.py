@@ -1,3 +1,4 @@
+from decimal import Decimal
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,8 +11,13 @@ from services.handleRegister import handleRegister,register_funcionario
 from services.handleLogin import handleLogin
 from services.auth import auth
 
+from services.contas.getSaldo import getSaldo
+from services.contas.deposito import depositar
+from services.contas.trasferencia import transferir
+
 from services.contas.createConta import create_conta
 
+from models.pydantic.TranferirBase import TranferirBase
 from models.pydantic.ContaBase import ContaBase
 from models.pydantic.LoginFuncionario import LoginFuncionario
 from models.pydantic.Usuario import UsuarioBase
@@ -47,6 +53,11 @@ async def register_funcionario_endpoint(form_data: UsuarioBase, session: AsyncSe
 
 @app.post('/api/login_funcionario')
 async def login_endpoint(data: LoginFuncionario, session: AsyncSession = Depends( get_async_session )):
+    data_dict = data.dict()
+    
+    if not data_dict["codigo_funcionario"]:
+        raise HTTPException(status_code=400, detail="é necessário o código do funcionario.")
+
     await handleLogin(data, session)
     return {"[200]", "OTP sended to email"}
 
@@ -66,29 +77,32 @@ async def abrir_conta(user: ContaBase, session: AsyncSession = Depends( get_asyn
         raise HTTPException(status_code=400, detail="Usário não está ativo no sistema.")
     await create_conta(user, session, usuario_ativo_sistema)
 
-@app.post('/api/deposito')
-async def abrir_conta(user: ContaBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
-    pass
+@app.post('/api/depositar')
+async def abrir_conta(valor: dict, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+    response = await depositar(valor, session, usuario_ativo_sistema)
+    return response
 
-@app.post('/api/transeferencia')
-async def abrir_conta(user: ContaBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
-    pass
+@app.post('/api/transferir')
+async def tranferir(tranferencia: TranferirBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+    response = await transferir(tranferencia, session, usuario_ativo_sistema)
+    return response
 
 @app.post('/api/saque')
-async def abrir_conta(user: ContaBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+async def sacar(user: ContaBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
    pass
 
 @app.get('/api/saldo')
-async def abrir_conta(user: ContaBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
-    pass
+async def saldo(session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+    resultado = await getSaldo(session, usuario_ativo_sistema)
+    return resultado
 
 # ROTAS DE TEST PARA ADMIN
 
 @app.post('/api/test-otp')
-async def verify_otp(email: str, otp: str, usuario_ativo_sistema = Depends(get_current_user)):
+async def verify_otp(test: dict, usuario_ativo_sistema = Depends(get_current_user)):
     if usuario_ativo_sistema.tipo_usuario != 'admin':
         raise HTTPException(status_code=400, detail="Error, only for admins.")
-    send_otp(email, otp)
+    send_otp(test["email"], test["otp"])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

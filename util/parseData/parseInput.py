@@ -9,9 +9,9 @@ def parseInput(data):
         "tipo_usuario": remove_space(data["tipo_usuario"]),
         "senha_hash": data["senha_hash"],
         "email":data["email"],
-        "score_credito": None,
-        "cargo": None, 
-        "id_supervisor": None, 
+        "score_credito": data["score_credito"],
+        "cargo": data["cargo"], 
+        "id_supervisor": data["id_supervisor"], 
         "endereco":{
             "cep": only_numbers(data["endereco"]["cep"]),
             "local": data["endereco"]["local"],

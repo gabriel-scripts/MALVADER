@@ -24,7 +24,10 @@ async def handleLogin(login_data, session):
         raise HTTPException(status_code=400, detail="User not exists")
 
     if user.tipo_usuario == 'funcionario':
-        codigo = funcionario_db.find_by_codigo(login_data["codigo_funcionario"])
+        if not login_dict["codigo_funcionario"]:
+            raise HTTPException(status_code=400, detail="Funcionario code connot be null")
+
+        codigo = funcionario_db.find_by_codigo(login_dict["codigo_funcionario"])
         if not codigo:
             raise HTTPException(status_code=400, detail="Funcionario not exists")
         

@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv("JWT")
 ALGORITHM = "HS256"
 
 
-async def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=30)):
+async def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=120)):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
@@ -46,8 +46,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
                 "cpf": cpf,
                 "email": email
             }
-
-        if tipo_usuario == 'funcionario':
+            return user
+        
+        if tipo_usuario == 'funcionario' or 'admin':
             user = {
                 "id_usuario": user_id,
                 "tipo_usuario": tipo_usuario,
@@ -55,8 +56,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
                 "codigo_funcionario": codigo_funcionario,
                 "cpf": cpf
             }
+            return user
 
-        return user
+        
     except JWTError:
         raise HTTPException(status_code=401, detail="Error to valid token")
 

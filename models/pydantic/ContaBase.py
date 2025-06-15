@@ -17,3 +17,4 @@ class ContaBase(BaseModel):
     data_abertura: Optional[date] = None
     status: Optional[str] = 'ativa'
     agencia: AgenciaBase
+    perfil_risco: Optional[str] = None

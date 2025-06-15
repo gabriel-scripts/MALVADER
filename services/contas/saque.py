@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 from dao.repository.conta.ContaRepository import ContaRepository
 from dao.repository.conta.TransacaoRepository import TransacaoRepository
-from util import save_auditoria
+from util.save_auditoria import save_auditoria
 
 
 async def sacar(id_conta, valor, session, usuario_logado):

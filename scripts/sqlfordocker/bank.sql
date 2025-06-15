@@ -85,7 +85,7 @@ CREATE TABLE conta_corrente (
 CREATE TABLE conta_investimento (
     id_conta_investimento INT AUTO_INCREMENT PRIMARY KEY,
     id_conta INT UNIQUE NOT NULL,
-    perfil_risco ENUM('conservador', 'moderado', 'arrojado') NOT NULL,
+    perfil_risco ENUM('BAIXO', 'MEDIO', 'ALTO') NOT NULL,
     valor_minimo DECIMAL(15,2) NOT NULL,
     taxa_rendimento_base DECIMAL(5,4) NOT NULL,
     FOREIGN KEY (id_conta) REFERENCES conta(id_conta)
