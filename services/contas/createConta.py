@@ -69,8 +69,9 @@ async def conta_type(input_data_dict, session, conta_criada):
             "taxa_rendimento": Decimal('0.005'),
             "ultimo_rendimento": datetime.now().date() 
         }
-        await conta_poupanca_db.create(poupanca)
-
+        conta_poupanca = await conta_poupanca_db.create(poupanca)
+        if not conta_poupanca:
+            raise HTTPException(status_code=400, detail="Fail to create conta poupanca")
     
     if input_data_dict["tipo_conta"] == 'corrente':
 
@@ -83,7 +84,10 @@ async def conta_type(input_data_dict, session, conta_criada):
             "data_vencimento": datetime.now() + timedelta(weeks=120),  
             "taxa_manutencao": await gerar_taxa(session) 
         }
-        await conta_corrente_db.create(corrente)
+        conta_corrente = await conta_corrente_db.create(corrente)
+
+        if not conta_corrente:
+            raise HTTPException(status_code=400, detail="Fail to create conta corrente")
 
     if input_data_dict["tipo_conta"] == 'investimento':
         if not input_data_dict["perfil_risco"]:
@@ -95,7 +99,10 @@ async def conta_type(input_data_dict, session, conta_criada):
             "valor_minimo": Decimal('1000.00'),
             "taxa_rendimento_base": Decimal('0.01') 
         }
-        await conta_investimento_db.create(investimento)
+        conta_investimeto = await conta_investimento_db.create(investimento)
+
+        if not conta_investimeto:
+            raise HTTPException(status_code=400, detail="Fail to create conta investimento")
 
 async def create_agencia(session, input_data_dict, id_endereco):
     agencia_db = AgenciaRepository(session)

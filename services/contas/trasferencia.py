@@ -1,27 +1,32 @@
 from datetime import datetime
 from fastapi import HTTPException
 
+from util.clear_data import *
+from dao.repository.conta.AgenciaRepository import AgenciaRepository
 from dao.repository.conta.TransacaoRepository import TransacaoRepository
 from util.save_auditoria import save_auditoria
 
 from util.find_account_by_cpf import find_account_by_cpf
 
 async def transferir(transferencia, session, usuario_logado):
+    angencia_db = AgenciaRepository(session)
+    
     if not usuario_logado:
         raise HTTPException(status_code=400, detail="erro ao validar token")
 
     tranferencia_dict = transferencia.dict()
-
-    print("TRANSFERENCIAA:", tranferencia_dict)
-
     valor = tranferencia_dict["valor"]
-    conta_destino = await find_account_by_cpf(session, tranferencia_dict["cpf_destino"])
-    print("CONTAA DESTINOO", conta_destino)
+
+    agencia = await angencia_db.find_by_codigo_agencia(tranferencia_dict["agencia"])
+    conta_destino = await find_account_by_cpf(session, only_numbers(tranferencia_dict["cpf_destino"]))
+
+    if not agencia:
+        raise HTTPException(status_code=400, detail="Agencia não existe.")
+
     if not conta_destino:
         raise HTTPException(status_code=400, detail="Conta destino associada a esse cpf não existe")
 
     conta = await find_account_by_cpf(session, usuario_logado["cpf"])
-    print("CONTAAA", conta)
     if conta.saldo < tranferencia_dict["valor"]:
         raise HTTPException(status_code=400, detail="Saldo insuficiente")
     

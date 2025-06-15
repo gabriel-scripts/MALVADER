@@ -33,6 +33,11 @@ class ContaRepository(BaseRepository[Conta]):
         result = await self.db.execute(select(Conta).where(Conta.id_cliente == id_cliente))
         return result.scalars().first()
 
+    async def find_by_numero_conta(self, numero_conta: str) -> Optional[Conta]:
+        result = await self.db.execute(select(Conta).where(Conta.numero_conta == numero_conta))
+        return result.scalars().first()
+
+
     async def update(self) -> Optional[Conta]:
         pass
 

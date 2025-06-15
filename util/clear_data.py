@@ -4,7 +4,6 @@ def only_numbers(data):
     data = ''.join(filter(str.isdigit, data))  
     return data
 
-
 def remove_space(data):
     return data.replace(" ", "")
 
