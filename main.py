@@ -17,7 +17,7 @@ from services.contas.trasferencia import transferir
 
 from services.get_all_functions.get_all import *
 
-from services.contas.createConta import create_conta
+from services.conta_funcionario.createConta import create_conta
 
 from models.pydantic.TranferirBase import TranferirBase
 from models.pydantic.ContaBase import ContaBase
