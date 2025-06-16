@@ -84,6 +84,12 @@ async def abrir_conta(valor: dict, session: AsyncSession = Depends( get_async_se
     response = await depositar(valor, session, usuario_ativo_sistema)
     return response
 
+@app.post('/api/depositar')
+async def abrir_conta(valor: dict, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
+    response = await depositar(valor, session, usuario_ativo_sistema)
+    return response
+
+
 @app.post('/api/transferir')
 async def tranferir(tranferencia: TranferirBase, session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
     response = await transferir(tranferencia, session, usuario_ativo_sistema)
@@ -97,6 +103,19 @@ async def sacar(user: ContaBase, session: AsyncSession = Depends( get_async_sess
 async def saldo(session: AsyncSession = Depends( get_async_session), usuario_ativo_sistema = Depends(get_current_user)):
     resultado = await getSaldo(session, usuario_ativo_sistema)
     return resultado
+
+@app.post('/api/get_user')
+async def user_by_cpf(cpf: dict, session: AsyncSession = Depends( get_async_session)):
+    return await get_user_by_cpf(session, cpf)
+
+@app.post('/api/get_conta')
+async def conta_by_codigo(conta_codigo: dict, session: AsyncSession = Depends( get_async_session)):
+    return await get_by_numero_conta(session, conta_codigo)
+
+@app.post('/api/get_funcionario')
+async def funcionario_by_codigo(conta_codigo: dict, session: AsyncSession = Depends( get_async_session)):
+    return await get_by_codigo(session, conta_codigo)
+
 
 # ROTAS DE TEST PARA ADMIN
 
