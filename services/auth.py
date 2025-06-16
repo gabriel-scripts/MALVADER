@@ -58,7 +58,7 @@ async def auth(auth_input, session):
             "id_usuario": user.id_usuario,
             "email": user.email,
             "codigo_funcionario": funcionario.codigo_funcionario,
-            "tipo": user.tipo_usuario,
+            "tipo_usuario": user.tipo_usuario,
             "cargo": funcionario.cargo
         }
 

@@ -5,16 +5,17 @@ from datetime import date
 
 class AgenciaBase(BaseModel):
     nome: str
-    codigo_agencia: str
+    codigo_agencia: int
     endereco_id: Optional[str] = None
 
 class ContaBase(BaseModel):
-    numero_conta: Optional[str] = None
-    id_agencia: Optional[str] = None
+    numero_conta: Optional[int] = None
+    id_agencia: Optional[int] = None
+    cpf_cliente: str
     saldo: Optional[Decimal] = Decimal('0.00')
     tipo_conta:  Literal['poupanca', 'corrente', 'investimento']
-    id_cliente: Optional[str] = None
+    id_cliente: int
     data_abertura: Optional[date] = None
     status: Optional[Literal['ativa', 'inativa', 'bloqueada']] = 'ativa'
     agencia: AgenciaBase
-    perfil_risco: Optional[str] = None
+    perfil_risco: Literal['baixo', 'medio', 'alto']

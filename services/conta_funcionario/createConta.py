@@ -115,14 +115,21 @@ async def buscar_agencia(session, codigo_agencia):
     return agencia
     
 async def create_conta(input_data, session, current_user):
+    print(current_user)
     input_data_dict = input_data.dict()
     
+    if not current_user:
+        raise HTTPException(status_code=400, detail="Usuário não está autenticado.")
+
+    if current_user["tipo_usuario"] != 'funcionario':
+        raise HTTPException(status_code=400, detail="Somente funciónario podem criar contas")
+
     user_db_current = UserRepository(session)
     endereco_db_current = EnderecoRepository(session)
     cliente_db = ClienteRepository(session)
     conta_db = ContaRepository(session)
     
-    user_current = await user_db_current.find_by_cpf(current_user["cpf"])
+    user_current = await user_db_current.find_by_cpf(input_data_dict["cpf_cliente"])
     endereco = await endereco_db_current.find_by_user_id(user_current.id_usuario)
     cliente = await cliente_db.find_by_user_id(user_current.id_usuario)
     conta = await conta_db.find_by_cliente_id(cliente.id_cliente)

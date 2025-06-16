@@ -56,6 +56,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
                 "codigo_funcionario": codigo_funcionario,
                 "cpf": cpf
             }
+            print("USER ON PAYLOAD", user)
             return user
 
         
