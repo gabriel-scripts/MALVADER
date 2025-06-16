@@ -16,7 +16,7 @@ from services.contas.deposito import depositar
 from services.contas.trasferencia import transferir
 
 from services.get_all_functions.get_all import *
-
+from util.find_account_by_cpf import *
 from services.conta_funcionario.createConta import create_conta
 
 from models.pydantic.TranferirBase import TranferirBase
@@ -117,6 +117,16 @@ async def listar_contas(session: AsyncSession = Depends( get_async_session)):
 @app.get('/api/get_all_funcionarios')
 async def listar_contas(session: AsyncSession = Depends( get_async_session)):
     return await get_all_funcionarios(session)
+
+@app.post("/api/buscar_conta_cpf")
+async def buscar_contar(cpf: str, session: AsyncSession = Depends( get_async_session)):
+    conta = await find_account_by_cpf(session, cpf)
+    return conta
+
+@app.post("/api/buscar_usuario_cpf")
+async def buscar_contar(cpf: dict, session: AsyncSession = Depends( get_async_session)):
+    conta = await find_user_by_cpf(session, cpf)
+    return conta
 
 @app.get('/api/get_all_usuarios')
 async def listar_usuarios(session: AsyncSession = Depends( get_async_session)):

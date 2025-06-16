@@ -61,9 +61,6 @@ async def conta_type(input_data_dict, session, conta_criada):
     conta_poupanca_db = PoupancaRepository(session)
 
     if input_data_dict["tipo_conta"] == 'poupanca':
-        if input_data_dict["perfil_risco"] != None:
-            raise HTTPException(status_code=400, detail="Account don´t have risk perfil.")
-        
         poupanca = {
             "id_conta": conta_criada.id_conta,
             "taxa_rendimento": Decimal('0.005'),
@@ -74,10 +71,6 @@ async def conta_type(input_data_dict, session, conta_criada):
             raise HTTPException(status_code=400, detail="Fail to create conta poupanca")
     
     if input_data_dict["tipo_conta"] == 'corrente':
-
-        if input_data_dict["perfil_risco"] != None:
-            raise HTTPException(status_code=400, detail="Account don´t have risk perfil.")
-
         corrente = {
             "id_conta": conta_criada.id_conta,
             "limite": Decimal(10000.0000), 
@@ -130,6 +123,10 @@ async def create_conta(input_data, session, current_user):
     conta_db = ContaRepository(session)
     
     user_current = await user_db_current.find_by_cpf(input_data_dict["cpf_cliente"])
+
+    if not user_current:
+        raise HTTPException(status_code=400, detail="Usuário")
+    
     endereco = await endereco_db_current.find_by_user_id(user_current.id_usuario)
     cliente = await cliente_db.find_by_user_id(user_current.id_usuario)
     conta = await conta_db.find_by_cliente_id(cliente.id_cliente)

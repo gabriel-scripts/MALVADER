@@ -13,3 +13,8 @@ async def find_account_by_cpf(session, cpf):
     conta = await conta_db.find_by_cliente_id(cliente.id_cliente)
 
     return conta
+
+async def find_user_by_cpf(session, cpf):
+    user_db_current = UserRepository(session)
+    user = await user_db_current.find_by_cpf(cpf["cpf"])
+    return {"cpf:", user.cpf, "data_nascimento:", user.data_nascimento, "nome", user.nome, "telefone", user.telefone}
