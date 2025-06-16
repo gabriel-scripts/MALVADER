@@ -5,15 +5,18 @@ from dao.repository.UserRepository import UserRepository
 from dao.repository.FuncionarioRepository import FuncionarioRepository
 
 from util.jwt.JWT import create_access_token
+from util.save_auditoria import save_auditoria
 
 async def auth(auth_input, session):
 
     auth_dict = auth_input.dict()
 
+    print(auth_input)
+
     user_db = UserRepository(session)
     user = await user_db.find_by_cpf(auth_dict["cpf"])
 
-    print(user)
+    print(user.__dict__)
 
     if(user.otp_ativo == None):
         raise HTTPException(status_code=400, detail="User with no OTP")
@@ -29,10 +32,17 @@ async def auth(auth_input, session):
             "id_usuario": user.id_usuario,
             "cpf": user.cpf,
             "email": user.email,
-            "codigo_funcionario": None,
-            "tipo_usuario": user.tipo_usuario,
-            "cargo": None
+            "tipo_usuario": user.tipo_usuario
         }
+        
+        auditoria_data = {
+            "id_usuario": user.id_usuario,
+            "acao": "logar_cliente",
+            "data_hora": datetime.now(),
+            "detalhes": f"Usuário {user.email} logado com sucesso"
+        }
+
+        await save_auditoria(session, auditoria_data)
         codigo = await create_access_token(data)
         return {"cliente": codigo}
     
@@ -48,8 +58,17 @@ async def auth(auth_input, session):
             "id_usuario": user.id_usuario,
             "email": user.email,
             "codigo_funcionario": funcionario.codigo_funcionario,
-            "tipo": user.tipo_usuario,
+            "tipo_usuario": user.tipo_usuario,
             "cargo": funcionario.cargo
         }
+
+        auditoria_data = {
+            "id_usuario": user.id_usuario,
+            "acao": "logar_funcionario",
+            "data_hora": datetime.now(),
+            "detalhes": f"Usuário {user.email} logado com sucesso"
+        }
+
+        await save_auditoria(session, auditoria_data)
         codigo = await create_access_token(data)
         return {"funcionario": codigo}

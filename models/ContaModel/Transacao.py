@@ -12,6 +12,3 @@ class Transacao(Base):
     valor = Column(DECIMAL(15,2), nullable=False)
     data_hora = Column(DateTime, nullable=False)
     descricao = Column(String(255))
-
-    conta_origem = relationship("Conta", foreign_keys=[id_conta_origem], back_populates="transacoes_origem")
-    conta_destino = relationship("Conta", foreign_keys=[id_conta_destino], back_populates="transacoes_destino")

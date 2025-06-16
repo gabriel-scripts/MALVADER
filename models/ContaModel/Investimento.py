@@ -10,5 +10,3 @@ class Investimento(Base):
     perfil_risco = Column(Enum('conservador', 'moderado', 'arrojado'), nullable=False)
     valor_minimo = Column(DECIMAL(15,2), nullable=False)
     taxa_rendimento_base = Column(DECIMAL(5,4), nullable=False)
-
-    conta = relationship("Conta", back_populates="investimento")

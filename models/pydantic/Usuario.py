@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
 from datetime import date
 
 class Endereco(BaseModel):
@@ -16,7 +16,7 @@ class UsuarioBase(BaseModel):
     cpf: str
     data_nascimento: date 
     telefone: str
-    tipo_usuario: str
+    tipo_usuario: Literal['funcionario', 'cliente', 'admin']
     senha_hash: str
     email: str
     score_credito:  Optional[str] = None
