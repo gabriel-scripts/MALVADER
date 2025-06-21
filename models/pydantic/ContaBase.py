@@ -9,12 +9,12 @@ class AgenciaBase(BaseModel):
     endereco_id: Optional[str] = None
 
 class ContaBase(BaseModel):
-    numero_conta: Optional[int] = None
+    # numero_conta: Optional[int] = None
     id_agencia: Optional[int] = None
     cpf_cliente: str
     saldo: Optional[Decimal] = Decimal('0.00')
     tipo_conta:  Literal['poupanca', 'corrente', 'investimento']
-    id_cliente: int
+    id_cliente: Optional[int] = None
     data_abertura: Optional[date] = None
     status: Optional[Literal['ativa', 'inativa', 'bloqueada']] = 'ativa'
     agencia: AgenciaBase

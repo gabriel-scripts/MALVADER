@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 
 import os
 from dotenv import load_dotenv
+from fastapi import HTTPException
 load_dotenv(override=True)
 
 smtp_server = os.getenv("smtp_server")
@@ -13,6 +14,12 @@ sender_email = os.getenv("sender_email")
 sender_password = os.getenv("sender_password")  
 
 async def send_otp(recipient_email: str, otp: str):
+    if not recipient_email:
+        raise HTTPException(status_code=403, detail="Need a email to send OTP")
+
+    if not otp:
+      raise HTTPException(status_code=403, detail="OTP cannot be null")
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Seu código OTP"
     msg["From"] = sender_email
