@@ -132,32 +132,32 @@ async def is_admin(tipo_usuario):
 
 @app.post('/api/test-otp')
 async def verify_otp(test: dict, current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     send_otp(test["email"], test["otp"])
 
 @app.get('/api/get_all_agencias')
 async def listar_agencias(session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     return await get_all_agencia(session)
 
 @app.get('/api/get_all_contas')
 async def listar_contas(session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     return await get_all_contas(session)
 
 @app.get('/api/get_all_funcionarios')
 async def listar_contas(session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     return await get_all_funcionarios(session)
 
 @app.get('/api/get_all_usuarios')
 async def listar_usuarios(session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     return await get_all_usuarios(session)
 
 @app.get('/api/get_all_clientes')
 async def listar_clientes(session: AsyncSession = Depends(get_async_session), current_user = Depends(get_current_user)):
-    await is_admin(current_user.tipo_usuario)
+    await is_admin(current_user["tipo_usuario"])
     return await get_all_clientes(session)
 
 if __name__ == "__main__":
