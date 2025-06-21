@@ -1,0 +1,69 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-8.3.5, pluggy-1.5.0
+rootdir: /home/gabriel/Desktop/MALVADER COMPLETO/MALVADER
+plugins: asyncio-1.0.0, anyio-4.9.0, cov-6.2.1
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 33 items
+
+test/test_create_account.py ......                                       [ 18%]
+test/test_otp.py None
+..None
+..                                                    [ 30%]
+test/test_password.py ............                                       [ 66%]
+test/test_validate_register.py None
+.None
+..........                               [100%]
+
+=============================== warnings summary ===============================
+test/test_create_account.py::test_validate_create_success[asyncio]
+test/test_create_account.py::test_create_conta_usuario_not_exists[asyncio]
+test/test_create_account.py::test_validate_create_success[trio]
+test/test_create_account.py::test_create_conta_usuario_not_exists[trio]
+  /home/gabriel/Desktop/MALVADER COMPLETO/MALVADER/services/conta_funcionario/createConta.py:124: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    input_data_dict = input_data.dict()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.10.12-final-0 _______________
+
+Name                                             Stmts   Miss  Cover
+--------------------------------------------------------------------
+dao/config/database.py                              14      5    64%
+dao/repository/BaseRepository.py                    16      4    75%
+dao/repository/ClienteRepository.py                 43     27    37%
+dao/repository/EnderecoRepository.py                34     18    47%
+dao/repository/UserRepository.py                    61     46    25%
+dao/repository/conta/AgenciaRepository.py           30     15    50%
+dao/repository/conta/ContaRepository.py             33     17    48%
+dao/repository/conta/CorrenteRepository.py          27     13    52%
+dao/repository/conta/PoupancaRepository.py          27     13    52%
+dao/repository/conta/investimentoRepository.py      27     13    52%
+main.py                                            121    121     0%
+models/Agencia.py                                    8      0   100%
+models/Cliente.py                                   12      2    83%
+models/ContaModel/Conta.py                          14      0   100%
+models/ContaModel/Corrente.py                       10      0   100%
+models/ContaModel/Investimento.py                   10      0   100%
+models/ContaModel/Poupanca.py                        9      0   100%
+models/Endereco.py                                  24      8    67%
+models/Usuario.py                                   26      7    73%
+models/pydantic/ContaBase.py                        18      0   100%
+services/__init__.py                                 0      0   100%
+services/auth.py                                    34     34     0%
+services/conta_funcionario/createConta.py           95     33    65%
+services/handleLogin.py                             28     28     0%
+services/handleRegister.py                          85     85     0%
+services/validadeData.py                            78     20    74%
+services/validateCurrentUser.py                      6      6     0%
+test/__init__.py                                     0      0   100%
+test/db/test_base.py                                 0      0   100%
+test/db/test_db.py                                   0      0   100%
+test/test_create_account.py                         47      0   100%
+test/test_otp.py                                    26      7    73%
+test/test_password.py                               41      2    95%
+test/test_validate_register.py                      65      2    97%
+util/is_cpf_valid.py                                15      1    93%
+util/send_otp.py                                    30      3    90%
+--------------------------------------------------------------------
+TOTAL                                             1114    530    52%
+======================= 33 passed, 4 warnings in 10.54s ========================
