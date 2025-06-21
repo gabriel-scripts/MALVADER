@@ -8,8 +8,6 @@ from util.save_auditoria import save_auditoria
 attempts = {}
 
 async def verify_password(user_hashed_password, input_password, user_id, session):
-    print(user_hashed_password)
-    print("input:", input_password)
     tentativas = attempts.get(user_id, {"count": 0, "bloqueado_ate": None})
 
     if tentativas["bloqueado_ate"] and tentativas["bloqueado_ate"] > datetime.now():
@@ -19,9 +17,6 @@ async def verify_password(user_hashed_password, input_password, user_id, session
     
     if not input_password_hashed: 
         raise HTTPException(status_code=400, detail="Error")
-
-
-    print("Input hashed: ", input_password_hashed)
 
     if user_hashed_password != input_password_hashed:
         tentativas["count"] += 1

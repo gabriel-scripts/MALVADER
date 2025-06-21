@@ -7,19 +7,15 @@ from util.generate.generate_otp import generate_otp
 from dao.repository.UserRepository import UserRepository
 from dao.repository.FuncionarioRepository import FuncionarioRepository
 
-async def handleLogin(login_data, session):
-    login_dict = login_data.dict()
+from fastapi import BackgroundTasks
 
-    print(login_data)
+async def handleLogin(login_data, session, background_tasks: BackgroundTasks):
+    login_dict = login_data.dict()
 
     user_db = UserRepository(session)
     funcionario_db = FuncionarioRepository(session)
 
-    try: 
-        user = await user_db.find_by_cpf(login_dict["cpf"])
-    except Exception as e:
-        print(e)
-        
+    user = await user_db.find_by_cpf(login_dict["cpf"])        
     if not user:
         raise HTTPException(status_code=400, detail="User not exists")
 
@@ -35,4 +31,5 @@ async def handleLogin(login_data, session):
     otp = await generate_otp(session, user.id_usuario)
     if not otp:
         raise HTTPException(status_code=400, detail="error to generate OTP")
-    await send_otp(user.email, otp)
+    
+    background_tasks.add_task(send_otp, user.email, otp)

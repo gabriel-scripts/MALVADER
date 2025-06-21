@@ -19,24 +19,21 @@ REFRESH_EXPIRE_MINUTES = 60 * 24 * 7
 
 async def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=120)):
     to_encode = data.copy()
-    expire = datetime.now() + expires_delta
+    expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def create_refresh_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.now() + timedelta(minutes=REFRESH_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm=ALGORITHM)
+# def create_refresh_token(data: dict):
+#     to_encode = data.copy()
+#     expire = datetime.utcnow() + timedelta(minutes=REFRESH_EXPIRE_MINUTES)
+#     to_encode.update({"exp": expire})
+#     return jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm=ALGORITHM)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-        print("payload", payload)
-
         user_id = payload.get("id_usuario")
         tipo_usuario = payload.get("tipo_usuario")
         cargo = payload.get("cargo")
@@ -65,9 +62,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             }
             print("USER ON PAYLOAD", user)
             return user
-
         
-    except JWTError:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=401, detail="Error to valid token")
 
 # token = create_access_token(
