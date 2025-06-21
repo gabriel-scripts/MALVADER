@@ -12,15 +12,22 @@ import os
 load_dotenv(find_dotenv(), override=True)
 
 SECRET_KEY = os.getenv("JWT")
+REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY")
 ALGORITHM = "HS256"
 
+REFRESH_EXPIRE_MINUTES = 60 * 24 * 7  
 
 async def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=120)):
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
+    expire = datetime.now() + expires_delta
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+def create_refresh_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now() + timedelta(minutes=REFRESH_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm=ALGORITHM)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
