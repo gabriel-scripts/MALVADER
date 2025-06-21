@@ -5,9 +5,9 @@ from datetime import date
 
 async def validate_data(user_data: dict):
 
-    estado_length = len(user_data["endereco"]["estado"])
     cpf_length = len(user_data["cpf"])
     telefone_length = len(user_data.get("telefone"))
+    estado_length = len(user_data["endereco"]["estado"])
     cep_length = len(user_data["endereco"]["cep"])
     local_length = len(user_data["endereco"]["local"])
     numero_casa_length = len(str(user_data["endereco"]["numero_casa"]))
@@ -44,7 +44,7 @@ async def validate_data(user_data: dict):
 
     if not user_data["email"]: 
         raise HTTPException(status_code=400, detail="'email' cannot be null")
-    if user_data["tipo_usuario"] is None:
+    if not user_data["tipo_usuario"]:
         raise HTTPException(status_code=400, detail="'tipo_usuario' cannot be null")
     if not isValidCpf(user_data["cpf"]):
         raise HTTPException(status_code=400, detail="CPF invalid")
