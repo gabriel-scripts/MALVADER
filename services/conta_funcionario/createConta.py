@@ -107,28 +107,33 @@ async def buscar_agencia(session, codigo_agencia):
     agencia = await agencia_db.find_by_codigo_agencia(codigo_agencia)
     return agencia
     
-async def create_conta(input_data, session, current_user):
-    print(current_user)
-    input_data_dict = input_data.dict()
-    
+async def validate_current_user(current_user):
     if not current_user:
         raise HTTPException(status_code=400, detail="Usuário não está autenticado.")
 
     if current_user["tipo_usuario"] != 'funcionario':
-        raise HTTPException(status_code=400, detail="Somente funciónario podem criar contas")
+        raise HTTPException(status_code=400, detail="Somente funcionários podem criar contas")
+    
+async def user_exists(input_data_dict, user_db_current):
+    user_account = await user_db_current.find_by_cpf(input_data_dict["cpf_cliente"])
+    if not user_account:
+        raise HTTPException(status_code=400, detail="Usuário não foi encontrado")
+    return user_account
+
+async def create_conta(input_data, session, current_user):
+    input_data_dict = input_data.dict()
+    
+    await validate_current_user(current_user)
 
     user_db_current = UserRepository(session)
     endereco_db_current = EnderecoRepository(session)
     cliente_db = ClienteRepository(session)
     conta_db = ContaRepository(session)
     
-    user_current = await user_db_current.find_by_cpf(input_data_dict["cpf_cliente"])
-
-    if not user_current:
-        raise HTTPException(status_code=400, detail="Usuário")
+    user_account = await user_exists(input_data_dict, user_db_current)
     
-    endereco = await endereco_db_current.find_by_user_id(user_current.id_usuario)
-    cliente = await cliente_db.find_by_user_id(user_current.id_usuario)
+    endereco = await endereco_db_current.find_by_user_id(user_account.id_usuario)
+    cliente = await cliente_db.find_by_user_id(user_account.id_usuario)
     conta = await conta_db.find_by_cliente_id(cliente.id_cliente)
 
     if conta != None:

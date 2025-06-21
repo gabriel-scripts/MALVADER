@@ -9,7 +9,7 @@ class AgenciaBase(BaseModel):
     endereco_id: Optional[str] = None
 
 class ContaBase(BaseModel):
-    numero_conta: Optional[int] = None
+    # numero_conta: Optional[int] = None
     id_agencia: Optional[int] = None
     cpf_cliente: str
     saldo: Optional[Decimal] = Decimal('0.00')
