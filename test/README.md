@@ -1,8 +1,10 @@
- # How to run tests:
+ # Commands for tests:
 
 
 ```
-pytest test/test_validate.py
+pytest test/test_validate_register.py
+pytest test/test_otp.py
+pytest test/test_password.py
 ```
 
 ```
