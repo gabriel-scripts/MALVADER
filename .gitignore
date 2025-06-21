@@ -12,3 +12,51 @@ env/
 
 .env
 *.env
+
+.pytest_cache
+
+htmlcov
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.eggs/
+
+# Distribution / packaging
+dist/
+build/
+*.egg
+*.whl
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.bak
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+temp/
+
+# Database files
+*.sqlite3
+*.db
+*.bak.db
+
+# User-specific files (e.g., local settings)
+local_settings.py
