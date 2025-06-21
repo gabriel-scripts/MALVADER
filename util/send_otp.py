@@ -13,7 +13,7 @@ smtp_port = os.getenv("smtp_port")
 sender_email = os.getenv("sender_email")  
 sender_password = os.getenv("sender_password")  
 
-async def send_otp(recipient_email: str, otp: str):
+def send_otp(recipient_email: str, otp: str):
     if not recipient_email:
         raise HTTPException(status_code=403, detail="Need a email to send OTP")
 

@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import BackgroundTasks
 
 from dao.config.database import get_async_session 
 
@@ -54,18 +55,18 @@ async def register_funcionario_endpoint(form_data: UsuarioBase, session: AsyncSe
     return {"[200]", "Funcionario registed with succes"}
 
 @app.post('/api/login_funcionario')
-async def login_endpoint(data: LoginFuncionario, session: AsyncSession = Depends( get_async_session )):
+async def login_endpoint(data: LoginFuncionario, background_tasks: BackgroundTasks, session: AsyncSession = Depends( get_async_session )):
     data_dict = data.dict()
     
     if not data_dict["codigo_funcionario"]:
         raise HTTPException(status_code=400, detail="é necessário o código do funcionario.")
 
-    await handleLogin(data, session)
+    await handleLogin(data, session, background_tasks)
     return {"[200]", "OTP sended to email"}
 
 @app.post('/api/login_cliente')
-async def login_endpoint(data: LoginBase, session: AsyncSession = Depends( get_async_session )):
-    await handleLogin(data, session)
+async def login_endpoint(data: LoginBase, background_tasks: BackgroundTasks, session: AsyncSession = Depends( get_async_session )):
+    await handleLogin(data, session, background_tasks)
     return {"[200]", "OTP sended to email"}
 
 @app.post('/api/authenticate_user')
